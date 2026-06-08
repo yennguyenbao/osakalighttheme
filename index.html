@@ -1,0 +1,1426 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Lịch trình Osaka 4 ngày — 2026</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Cormorant+Garamond:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&family=Noto+Serif+JP:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.2/Sortable.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<style>
+:root{
+  --bg:#f5f3ee;
+  --bg-2:#ede9e1;
+  --surface:rgba(0,0,0,0.04);
+  --surface-2:rgba(0,0,0,0.07);
+  --border:rgba(0,0,0,0.10);
+  --text:#1a1814;
+  --text-dim:#5a5650;
+  --text-mute:#9a9690;
+  --gold:#b5415a;
+  --gold-2:#c9607a;
+  --crimson:#8a2a2a;
+  --sakura:#c9607a;
+  --indigo:#2a3a6a;
+  --matcha:#4a6a3a;
+  --accent:var(--gold);
+  --radius:18px;
+  --shadow:0 20px 60px rgba(0,0,0,.12);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;-webkit-font-smoothing:antialiased;scroll-behavior:smooth}
+body{
+  background:
+    radial-gradient(1200px 600px at 80% -10%, rgba(201,96,122,.07), transparent 60%),
+    radial-gradient(900px 500px at -10% 30%, rgba(138,42,42,.06), transparent 60%),
+    radial-gradient(800px 500px at 50% 110%, rgba(42,58,106,.07), transparent 60%),
+    var(--bg);
+  min-height:100vh;
+}
+a{color:inherit;text-decoration:none}
+button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit}
+input,textarea,select{font-family:inherit;color:inherit}
+::selection{background:var(--gold);color:#000}
+
+/* ===== NAV ===== */
+.nav{
+  position:fixed;top:18px;left:50%;transform:translateX(-50%);
+  z-index:1000;display:flex;gap:6px;align-items:center;
+  padding:8px 10px;border-radius:999px;
+  background:rgba(245,243,238,.82);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+  border:1px solid rgba(0,0,0,.12);box-shadow:0 8px 32px rgba(0,0,0,.12);
+  max-width:calc(100vw - 24px);overflow-x:auto;
+}
+.nav button{
+  padding:8px 14px;border-radius:999px;font-size:13px;font-weight:500;color:var(--text-dim);
+  white-space:nowrap;transition:all .25s ease;
+}
+.nav button:hover{color:var(--text);background:var(--surface)}
+.nav button.active{background:linear-gradient(135deg,var(--gold),var(--gold-2));color:#fff;font-weight:600}
+.nav .logo{font-family:'Noto Serif JP',serif;color:var(--gold);font-size:14px;padding:0 12px;border-right:1px solid var(--border);margin-right:4px}
+
+/* ===== CINEMATIC HERO ===== */
+.hero{
+  position:relative;width:100%;min-height:100vh;overflow:hidden;
+  background:#fff;display:flex;flex-direction:column;
+}
+.hero-video-wrap{
+  position:absolute;inset:auto 0 0 0;top:300px;z-index:0;overflow:hidden;
+}
+.hero-video-wrap video{
+  width:100%;height:100%;object-fit:cover;opacity:0;
+}
+.hero-video-grad{
+  position:absolute;inset:0;z-index:1;
+  background:linear-gradient(180deg,#fff 0%,rgba(255,255,255,.15) 30%,rgba(255,255,255,.15) 65%,#f5f3ee 100%);
+  pointer-events:none;
+}
+.hero-nav{
+  position:relative;z-index:10;display:flex;justify-content:space-between;align-items:center;
+  padding:24px 32px;max-width:1400px;margin:0 auto;width:100%;box-sizing:border-box;
+}
+.hero-logo{
+  font-family:'Instrument Serif',Georgia,serif;font-size:15px;color:#000;letter-spacing:.02em;
+  white-space:nowrap;
+}
+.hero-nav-links{display:flex;align-items:center;gap:2px;flex-wrap:nowrap;}
+.hero-nav-links button{
+  font-family:'Inter',sans-serif;font-size:13px;color:#6f6f6f;padding:8px 12px;border-radius:999px;
+  background:none;border:none;cursor:pointer;transition:color .2s ease,background .2s ease;white-space:nowrap;
+}
+.hero-nav-links button:hover{color:#000;background:rgba(0,0,0,.05)}
+.hero-nav-links button.hnav-active{color:#000;}
+.hero-begin-top{
+  font-family:'Inter',sans-serif;font-size:13px;font-weight:500;
+  background:#000;color:#fff;border:none;cursor:pointer;
+  padding:10px 22px;border-radius:999px;transition:transform .2s ease,box-shadow .2s ease;
+  white-space:nowrap;flex-shrink:0;
+}
+.hero-begin-top:hover{transform:scale(1.03);box-shadow:0 8px 24px rgba(0,0,0,.2)}
+.hero-content{
+  position:relative;z-index:10;flex:1;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  text-align:center;
+  padding-top:calc(8rem - 75px);padding-bottom:160px;padding-left:24px;padding-right:24px;
+}
+.hero-eyebrow{
+  font-family:'Inter',sans-serif;font-size:12px;letter-spacing:.4em;text-transform:uppercase;
+  color:#6f6f6f;margin-bottom:20px;
+  opacity:0;animation:heroFadeRise .8s .1s forwards;
+}
+.hero h1{
+  font-family:'Instrument Serif',Georgia,serif;font-weight:400;
+  font-size:clamp(50px,8.5vw,96px);line-height:.95;letter-spacing:-2.46px;
+  color:#000;max-width:1000px;margin:0;
+  opacity:0;animation:heroFadeRise .8s .2s forwards;
+}
+.hero h1 em{font-style:italic;color:#6f6f6f;font-weight:400;}
+.hero-sub{
+  font-family:'Inter',sans-serif;font-size:16px;color:#6f6f6f;
+  max-width:600px;margin:28px auto 0;line-height:1.7;
+  opacity:0;animation:heroFadeRise .8s .4s forwards;
+}
+.hero-cta{
+  font-family:'Inter',sans-serif;font-size:15px;font-weight:500;
+  background:#000;color:#fff;border:none;cursor:pointer;
+  padding:18px 56px;border-radius:999px;margin-top:44px;
+  transition:transform .2s ease,box-shadow .2s ease;
+  opacity:0;animation:heroFadeRise .8s .6s forwards;
+}
+.hero-cta:hover{transform:scale(1.03);box-shadow:0 12px 36px rgba(0,0,0,.2)}
+.hero-meta{
+  display:flex;justify-content:center;gap:16px;flex-wrap:wrap;
+  margin-top:48px;opacity:0;animation:heroFadeRise .8s .8s forwards;
+}
+.hero-meta-item{
+  display:flex;flex-direction:column;align-items:center;gap:4px;
+  background:rgba(0,0,0,.04);border:1px solid rgba(0,0,0,.08);
+  padding:12px 22px;border-radius:14px;
+}
+.hero-meta-item .v{font-family:'Instrument Serif',Georgia,serif;font-size:26px;color:#000}
+.hero-meta-item .l{font-size:11px;color:#6f6f6f;letter-spacing:.2em;text-transform:uppercase}
+@keyframes heroFadeRise{
+  from{opacity:0;transform:translateY(20px)}
+  to{opacity:1;transform:translateY(0)}
+}
+@keyframes fadeUp{to{opacity:1;transform:translateY(0)}}
+/* Hide old nav */
+.nav{display:none!important}
+
+/* ===== SECTIONS ===== */
+section{padding:80px 24px;max-width:1300px;margin:0 auto}
+.section-head{margin-bottom:48px;text-align:center}
+.section-head .eyebrow{color:var(--gold);font-size:11px;letter-spacing:.4em;text-transform:uppercase;margin-bottom:12px}
+.section-head h2{font-family:'Cormorant Garamond',serif;font-size:clamp(36px,5vw,56px);font-weight:500;letter-spacing:-.01em}
+.section-head h2 em{font-style:italic;color:var(--gold)}
+.section-head p{color:var(--text-dim);max-width:560px;margin:14px auto 0;line-height:1.7}
+
+/* ===== GLASS CARD ===== */
+.card{
+  background:var(--surface);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+  border:1px solid var(--border);border-radius:var(--radius);padding:24px;
+  transition:all .35s ease;
+}
+.card:hover{background:var(--surface-2);border-color:rgba(232,155,176,.25);transform:translateY(-2px)}
+
+/* ===== ITINERARY ===== */
+.day-tabs{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-bottom:32px}
+.day-tab{
+  padding:14px 22px;border-radius:14px;border:1px solid var(--border);background:var(--surface);
+  transition:all .3s ease;min-width:160px;text-align:left;
+}
+.day-tab:hover{border-color:var(--gold)}
+.day-tab.active{background:linear-gradient(135deg,rgba(181,65,90,.12),rgba(181,65,90,.04));border-color:var(--gold)}
+.day-tab .d{font-size:11px;color:var(--text-mute);letter-spacing:.2em;text-transform:uppercase}
+.day-tab .t{font-family:'Cormorant Garamond',serif;font-size:22px;margin-top:4px}
+.day-tab .s{font-size:11px;color:var(--text-dim);margin-top:2px}
+@media(max-width:640px){
+  .day-tabs{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+  .day-tab{min-width:0;padding:12px 14px;text-align:left}
+  .day-tab .t{font-size:16px}
+}
+
+.timeline{position:relative;padding-left:0}
+.timeline::before{
+  content:"";position:absolute;left:80px;top:20px;bottom:20px;width:1px;
+  background:linear-gradient(180deg,transparent,var(--border) 10%,var(--border) 90%,transparent);
+}
+.activity{display:grid;grid-template-columns:90px 1fr;gap:24px;margin-bottom:18px;position:relative}
+.activity-time{padding-top:22px;text-align:right;position:relative}
+.activity-time .start{font-family:'Cormorant Garamond',serif;font-size:22px;color:var(--gold)}
+.activity-time .end{font-size:11px;color:var(--text-mute);margin-top:2px}
+.activity-time::after{
+  content:"";position:absolute;right:-4px;top:30px;width:9px;height:9px;border-radius:50%;
+  background:var(--gold);box-shadow:0 0 0 4px rgba(232,155,176,.15);
+}
+.activity-card{padding:20px 22px;cursor:grab}
+.activity-card:active{cursor:grabbing}
+.activity-card .head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
+.activity-card h4{font-family:'Cormorant Garamond',serif;font-size:24px;font-weight:600}
+.activity-card .badge{font-size:10px;padding:4px 10px;border-radius:999px;background:rgba(181,65,90,.10);color:var(--gold);letter-spacing:.1em;text-transform:uppercase;white-space:nowrap}
+.activity-card .desc{color:var(--text-dim);font-size:14px;line-height:1.65;margin:10px 0 14px}
+.activity-card .meta{display:flex;flex-wrap:wrap;gap:14px;font-size:12px;color:var(--text-mute)}
+.activity-card .meta span i{color:var(--gold);margin-right:6px}
+.activity-card .actions{display:flex;gap:10px;margin-top:14px;padding-top:14px;border-top:1px solid var(--border);flex-wrap:wrap}
+.activity-card .actions a, .activity-card .actions button{
+  font-size:12px;padding:6px 12px;border-radius:8px;background:var(--surface-2);color:var(--text-dim);
+  transition:all .2s ease;display:inline-flex;align-items:center;gap:6px;
+}
+.activity-card .actions a:hover,.activity-card .actions button:hover{background:var(--gold);color:#000}
+.activity-card .transport{display:flex;align-items:center;gap:10px;font-size:12px;color:var(--text-mute);margin-top:10px;padding:8px 12px;background:rgba(42,58,106,.08);border-radius:8px;border-left:2px solid var(--indigo)}
+
+.day-actions{display:flex;justify-content:center;gap:10px;margin-top:24px}
+.btn{padding:12px 22px;border-radius:10px;font-size:13px;font-weight:500;transition:all .25s ease;display:inline-flex;align-items:center;gap:8px}
+.btn-primary{background:linear-gradient(135deg,var(--gold),var(--gold-2));color:#fff;font-weight:600}
+.btn-primary:hover{transform:translateY(-1px);box-shadow:0 10px 30px rgba(232,155,176,.3)}
+.btn-ghost{background:var(--surface);border:1px solid var(--border);color:var(--text-dim)}
+.btn-ghost:hover{background:var(--surface-2);color:var(--text)}
+.btn-danger{background:rgba(162,59,59,.2);border:1px solid rgba(162,59,59,.4);color:#e89999}
+
+/* ===== MAP ===== */
+#map{height:560px;border-radius:var(--radius);border:1px solid var(--border);background:var(--surface);overflow:hidden}
+.leaflet-container{background:#e8e4dc;font-family:'Inter',sans-serif}
+.leaflet-popup-content-wrapper{background:rgba(245,243,238,.97);color:var(--text);border-radius:12px;border:1px solid var(--border);backdrop-filter:blur(20px)}
+.leaflet-popup-tip{background:rgba(245,243,238,.97)}
+.leaflet-popup-content{margin:14px 16px;font-size:13px}
+.leaflet-popup-content b{color:var(--gold);font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:600}
+.leaflet-control-zoom a{background:rgba(245,243,238,.9)!important;color:var(--text)!important;border-color:var(--border)!important}
+.map-legend{display:flex;gap:18px;flex-wrap:wrap;margin-top:16px;font-size:12px;color:var(--text-dim)}
+.map-legend .dot{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:6px;vertical-align:middle}
+
+/* ===== DATABASE GRID ===== */
+.filter-bar{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:24px;align-items:center}
+.filter-bar input{flex:1;min-width:220px;padding:12px 16px;border-radius:10px;background:var(--surface);border:1px solid var(--border);font-size:14px}
+.filter-bar input:focus{outline:none;border-color:var(--gold)}
+.filter-bar .chip{padding:8px 14px;border-radius:999px;background:var(--surface);border:1px solid var(--border);font-size:12px;color:var(--text-dim);transition:all .2s ease}
+.filter-bar .chip.active{background:var(--gold);color:#000;border-color:var(--gold);font-weight:600}
+.places-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:20px}
+.place{overflow:hidden;padding:0}
+.place-img{height:180px;background-size:cover;background-position:center;position:relative}
+.place-img .cat{position:absolute;top:12px;left:12px;padding:4px 10px;border-radius:999px;background:rgba(0,0,0,.6);backdrop-filter:blur(8px);font-size:10px;letter-spacing:.15em;text-transform:uppercase;color:var(--gold)}
+.place-body{padding:18px}
+.place-body h4{font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:600;margin-bottom:6px}
+.place-body .addr{font-size:12px;color:var(--text-mute);margin-bottom:10px}
+.place-body .desc{font-size:13px;color:var(--text-dim);line-height:1.6;margin-bottom:12px;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.place-body .row{display:flex;justify-content:space-between;align-items:center;font-size:12px;color:var(--text-mute);padding-top:12px;border-top:1px solid var(--border)}
+.place-body .row .cost{color:var(--gold);font-weight:600}
+
+/* ===== BUDGET ===== */
+.budget-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;margin-bottom:32px}
+.stat{padding:22px}
+.stat .l{font-size:11px;color:var(--text-mute);letter-spacing:.2em;text-transform:uppercase}
+.stat .v{font-family:'Cormorant Garamond',serif;font-size:36px;color:var(--gold);margin-top:8px}
+.stat .s{font-size:12px;color:var(--text-dim);margin-top:4px}
+.charts{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:32px}
+@media(max-width:840px){.charts{grid-template-columns:1fr}}
+.chart-box{padding:24px;height:340px;position:relative}
+.chart-box h4{font-family:'Cormorant Garamond',serif;font-size:20px;margin-bottom:14px}
+.expense-table{width:100%;border-collapse:collapse;font-size:13px}
+.expense-table th,.expense-table td{padding:12px 14px;text-align:left;border-bottom:1px solid var(--border)}
+.expense-table th{font-size:11px;color:var(--text-mute);letter-spacing:.15em;text-transform:uppercase;font-weight:500}
+.expense-table td input,.expense-table td select{background:transparent;border:none;width:100%;font-size:13px;padding:4px}
+.expense-table td input:focus,.expense-table td select:focus{outline:1px solid var(--gold);border-radius:4px}
+.expense-table tr:hover{background:var(--surface)}
+
+/* ===== CHECKLIST ===== */
+.checklist-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:20px}
+.checklist{padding:22px}
+.checklist h4{font-family:'Cormorant Garamond',serif;font-size:22px;margin-bottom:6px;display:flex;justify-content:space-between;align-items:center}
+.checklist .progress{height:4px;background:var(--surface-2);border-radius:2px;overflow:hidden;margin-bottom:16px}
+.checklist .progress .bar{height:100%;background:linear-gradient(90deg,var(--gold),var(--gold-2));transition:width .4s ease}
+.checklist ul{list-style:none}
+.checklist li{display:flex;align-items:center;gap:10px;padding:8px 0;font-size:14px;color:var(--text-dim)}
+.checklist li input[type=checkbox]{appearance:none;width:18px;height:18px;border:1.5px solid var(--border);border-radius:5px;cursor:pointer;position:relative;flex-shrink:0;transition:all .2s ease}
+.checklist li input[type=checkbox]:checked{background:var(--gold);border-color:var(--gold)}
+.checklist li input[type=checkbox]:checked::after{content:"✓";position:absolute;color:#000;font-size:13px;font-weight:700;top:-1px;left:3px}
+.checklist li input[type=checkbox]:checked + span{text-decoration:line-through;color:var(--text-mute)}
+.checklist li .del{margin-left:auto;color:var(--text-mute);opacity:0;transition:opacity .2s}
+.checklist li:hover .del{opacity:1}
+.checklist .add{display:flex;gap:6px;margin-top:10px}
+.checklist .add input{flex:1;background:var(--surface-2);border:1px solid var(--border);border-radius:8px;padding:8px 10px;font-size:13px}
+.checklist .add button{padding:0 12px;border-radius:8px;background:var(--gold);color:#000;font-weight:600}
+
+/* ===== JOURNAL ===== */
+.journal-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:20px}
+.journal-card{padding:24px}
+.journal-card h4{font-family:'Cormorant Garamond',serif;font-size:24px;margin-bottom:6px}
+.journal-card .date{font-size:11px;color:var(--text-mute);letter-spacing:.2em;text-transform:uppercase;margin-bottom:14px}
+.journal-card textarea{width:100%;min-height:140px;background:var(--surface-2);border:1px solid var(--border);border-radius:10px;padding:12px;font-size:13px;line-height:1.6;resize:vertical}
+.journal-card textarea:focus{outline:none;border-color:var(--gold)}
+.journal-photos{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:12px}
+.journal-photos img{width:100%;aspect-ratio:1;object-fit:cover;border-radius:8px}
+.journal-card .upload{display:inline-flex;align-items:center;gap:6px;margin-top:10px;font-size:12px;color:var(--gold);cursor:pointer}
+
+/* ===== EXPORT BAR ===== */
+.export-bar{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-top:32px}
+
+/* ===== FOOTER ===== */
+footer{text-align:center;padding:60px 24px 40px;color:var(--text-mute);font-size:12px;border-top:1px solid var(--border);margin-top:60px}
+footer .jp{font-family:'Noto Serif JP',serif;color:var(--gold);font-size:14px;margin-bottom:10px}
+
+/* ===== ACCORDION ===== */
+.acc{border:1px solid var(--border);border-radius:12px;margin-bottom:10px;overflow:hidden}
+.acc summary{padding:16px 20px;cursor:pointer;font-weight:500;display:flex;justify-content:space-between;align-items:center;list-style:none}
+.acc summary::-webkit-details-marker{display:none}
+.acc summary::after{content:"+";color:var(--gold);font-size:22px;transition:transform .3s}
+.acc[open] summary::after{transform:rotate(45deg)}
+.acc .body{padding:0 20px 20px;color:var(--text-dim);font-size:14px;line-height:1.7}
+
+/* ===== MODAL ===== */
+.modal{position:fixed;inset:0;background:rgba(26,24,20,.5);backdrop-filter:blur(10px);z-index:2000;display:none;align-items:center;justify-content:center;padding:20px}
+.modal.open{display:flex}
+.modal-content{background:var(--bg);border:1px solid var(--border);border-radius:var(--radius);padding:28px;max-width:520px;width:100%;max-height:90vh;overflow-y:auto;box-shadow:0 24px 80px rgba(0,0,0,.2)}
+.modal-content h3{font-family:'Cormorant Garamond',serif;font-size:28px;margin-bottom:18px}
+.field{margin-bottom:14px}
+.field label{display:block;font-size:12px;color:var(--text-mute);margin-bottom:6px;letter-spacing:.1em;text-transform:uppercase}
+.field input,.field textarea,.field select{width:100%;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:10px 12px;font-size:14px}
+.field input:focus,.field textarea:focus,.field select:focus{outline:none;border-color:var(--gold)}
+.modal-actions{display:flex;gap:10px;justify-content:flex-end;margin-top:20px}
+
+/* Scrollbar */
+::-webkit-scrollbar{width:8px;height:8px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:rgba(0,0,0,.15);border-radius:4px}
+::-webkit-scrollbar-thumb:hover{background:var(--gold)}
+@keyframes spin{to{transform:rotate(360deg)}}
+.review-stars{color:#f59e0b;font-size:14px;letter-spacing:1px}
+
+/* Toast */
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:rgba(20,20,28,.95);backdrop-filter:blur(20px);border:1px solid var(--gold);color:var(--text);padding:12px 22px;border-radius:999px;font-size:13px;z-index:3000;opacity:0;transition:all .35s ease;box-shadow:var(--shadow)}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+@media(max-width:640px){
+  .timeline::before{left:60px}
+  .activity{grid-template-columns:70px 1fr;gap:14px}
+  .nav{top:10px;padding:6px 8px}
+  .nav button{padding:6px 10px;font-size:12px}
+  .nav .logo{display:none}
+  section{padding:60px 18px}
+  .modal-content{padding:18px}
+}
+</style>
+</head>
+<body>
+
+<!-- HERO (cinematic video) -->
+<header class="hero" id="hero">
+  <!-- Video background -->
+  <div class="hero-video-wrap">
+    <video id="heroVideo" src="https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260328_083109_283f3553-e28f-428b-a723-d639c617eb2b.mp4" muted playsinline preload="auto"></video>
+    <div class="hero-video-grad"></div>
+  </div>
+
+  <!-- Navigation -->
+  <nav class="hero-nav">
+    <span class="hero-logo">大阪 · Osaka 2026</span>
+    <div class="hero-nav-links">
+      <button class="hnav-active" data-scroll="hero">Home</button>
+      <button data-scroll="itinerary">Itinerary</button>
+      <button data-scroll="map">Map</button>
+      <button data-scroll="places">Places</button>
+      <button data-scroll="budget">Budget</button>
+      <button data-scroll="checklist">Checklist</button>
+      <button data-scroll="journal">Journal</button>
+      <button data-scroll="export">Export</button>
+    </div>
+    <button class="hero-begin-top" onclick="document.getElementById('itinerary').scrollIntoView({behavior:'smooth',block:'start'})">Begin Journey</button>
+  </nav>
+
+  <!-- Hero content -->
+  <div class="hero-content">
+    <div class="hero-eyebrow">Osaka · Nhật Bản · 31/8 – 4/9/2026</div>
+    <h1>Beyond <em>the neon,</em><br/>we find <em>the soul.</em></h1>
+    <p class="hero-sub">Bốn ngày trọn vẹn giữa Dotonbori rực neon, đền torii đỏ thẳm Kyoto và hẻm phố cổ Namba — hành trình được thiết kế cho 3 người.</p>
+    <button class="hero-cta" onclick="document.getElementById('itinerary').scrollIntoView({behavior:'smooth',block:'start'})">Begin Journey</button>
+    <div class="hero-meta">
+      <div class="hero-meta-item"><span class="v">4</span><span class="l">Ngày</span></div>
+      <div class="hero-meta-item"><span class="v">3</span><span class="l">Người</span></div>
+      <div class="hero-meta-item"><span class="v">VJ828</span><span class="l">01:00 HCM → Osaka</span></div>
+      <div class="hero-meta-item"><span class="v">VJ829</span><span class="l">09:30 Osaka → HCM</span></div>
+    </div>
+  </div>
+</header>
+
+<!-- ITINERARY -->
+<section id="itinerary">
+  <div class="section-head">
+    <div class="eyebrow">Hành trình</div>
+    <h2>Lịch trình <em>4 Ngày</em></h2>
+    <p>Kéo thả để sắp xếp lại. Nhấn vào thẻ để chỉnh sửa, xoá hoặc mở Google Maps. Mọi giờ giấc, chi phí di chuyển đều được tính toán sẵn cho 3 người.</p>
+  </div>
+  <div class="day-tabs" id="dayTabs"></div>
+  <div id="dayContent"></div>
+  <div class="day-actions">
+    <button class="btn btn-primary" onclick="openAddActivity()"><i class="fa-solid fa-plus"></i> Add Activity</button>
+    <button class="btn btn-ghost" onclick="resetDay()"><i class="fa-solid fa-rotate-left"></i> Reset This Day</button>
+  </div>
+</section>
+
+<!-- MAP -->
+<section id="map-section">
+  <div class="section-head">
+    <div class="eyebrow">Geography</div>
+    <h2>Interactive <em>Map</em></h2>
+    <p>Hotel base in Namba. Routes update automatically as you reorder the itinerary.</p>
+  </div>
+  <div id="map"></div>
+  <div class="map-legend">
+    <span><span class="dot" style="background:#e89bb0"></span>Khách sạn (Namba)</span>
+    <span><span class="dot" style="background:#e8b4c3"></span>Ngày 1 · Dotonbori & Shinsaibashi</span>
+    <span><span class="dot" style="background:#a23b3b"></span>Ngày 2 · Osaka Castle & Nakazakicho</span>
+    <span><span class="dot" style="background:#7a8a5a"></span>Ngày 3 · Kyoto Day Trip</span>
+    <span><span class="dot" style="background:#3a4a7a"></span>Ngày 4 · Tennoji & Nipponbashi</span>
+    <span><span class="dot" style="background:#5a7a6a"></span>Ngày 5 · Ra sân bay KIX</span>
+  </div>
+</section>
+
+<!-- PLACES DATABASE -->
+<section id="places">
+  <div class="section-head">
+    <div class="eyebrow">Curated Database</div>
+    <h2>Places &amp; <em>Hidden Gems</em></h2>
+    <p>Eighty-five verified locations across attractions, cafés, restaurants, shopping and hidden corners.</p>
+  </div>
+  <div class="filter-bar">
+    <input id="placeSearch" placeholder="Search places, neighborhoods, vibes…" />
+    <button class="chip active" data-cat="all">All</button>
+    <button class="chip" data-cat="attraction">Attractions</button>
+    <button class="chip" data-cat="cafe">Cafés</button>
+    <button class="chip" data-cat="restaurant">Restaurants</button>
+    <button class="chip" data-cat="shopping">Shopping</button>
+    <button class="chip" data-cat="hidden">Hidden Gems</button>
+  </div>
+  <div class="filter-bar" style="margin-top:-8px">
+    <span style="font-size:11px;letter-spacing:.3em;text-transform:uppercase;color:var(--text-mute);margin-right:4px">City</span>
+    <button class="chip city-chip active" data-city="all">All Cities</button>
+    <button class="chip city-chip" data-city="Osaka">Osaka</button>
+    <button class="chip city-chip" data-city="Kyoto">Kyoto</button>
+    <button class="chip city-chip" data-city="Nara">Nara</button>
+  </div>
+  <div class="places-grid" id="placesGrid"></div>
+</section>
+
+<!-- BUDGET -->
+<section id="budget">
+  <div class="section-head">
+    <div class="eyebrow">Finance</div>
+    <h2>Budget <em>Planner</em></h2>
+    <p>Tất cả giá hiển thị bằng VND để dễ so sánh. Nhập JPY, VND hoặc USD — tự động quy đổi.</p>
+  </div>
+  <div class="budget-grid" id="budgetStats"></div>
+  <div class="charts">
+    <div class="chart-box card"><h4>By Category</h4><canvas id="pieChart"></canvas></div>
+    <div class="chart-box card"><h4>By Day</h4><canvas id="barChart"></canvas></div>
+  </div>
+  <div class="card" style="padding:0;overflow:hidden">
+    <table class="expense-table" id="expenseTable"></table>
+  </div>
+  <div class="day-actions">
+    <button class="btn btn-primary" onclick="addExpense()"><i class="fa-solid fa-plus"></i> Add Expense</button>
+    <button class="btn btn-ghost" onclick="exportCSV()"><i class="fa-solid fa-file-csv"></i> Export CSV</button>
+  </div>
+</section>
+
+<!-- CHECKLIST -->
+<section id="checklist">
+  <div class="section-head">
+    <div class="eyebrow">Preparation</div>
+    <h2>Travel <em>Checklists</em></h2>
+    <p>Everything you need before boarding. Auto-saved as you tick.</p>
+  </div>
+  <div class="checklist-grid" id="checklistGrid"></div>
+</section>
+
+<!-- JOURNAL -->
+<section id="journal">
+  <div class="section-head">
+    <div class="eyebrow">Memories</div>
+    <h2>Travel <em>Journal</em></h2>
+    <p>Capture each day. Notes auto-save. Photos stored locally in your browser.</p>
+  </div>
+  <div class="journal-grid" id="journalGrid"></div>
+</section>
+
+<!-- EXPORT -->
+<section id="export">
+  <div class="section-head">
+    <div class="eyebrow">Backup</div>
+    <h2>Export &amp; <em>Import</em></h2>
+    <p>Save your plan, share it with companions, or move it to another device.</p>
+  </div>
+  <div class="export-bar">
+    <button class="btn btn-primary" onclick="exportPDF()"><i class="fa-solid fa-file-pdf"></i> Export PDF</button>
+    <button class="btn btn-ghost" onclick="exportCSV()"><i class="fa-solid fa-file-csv"></i> Export Budget CSV</button>
+    <button class="btn btn-ghost" onclick="exportJSON()"><i class="fa-solid fa-file-code"></i> Export JSON</button>
+    <label class="btn btn-ghost" style="cursor:pointer"><i class="fa-solid fa-upload"></i> Import JSON
+      <input type="file" accept="application/json" onchange="importJSON(event)" style="display:none">
+    </label>
+    <button class="btn btn-danger" onclick="if(confirm('Reset all data to defaults?')){localStorage.clear();location.reload()}"><i class="fa-solid fa-trash"></i> Reset All</button>
+  </div>
+
+  <div style="margin-top:48px;max-width:780px;margin-left:auto;margin-right:auto">
+    <details class="acc" open>
+      <summary>Chi tiết chuyến bay</summary>
+      <div class="body">
+        <p><b>Đi:</b> VJ828 — HCM (SGN) → Osaka (KIX) · 01:00 → 08:30 · 31/8/2026 · Deluxe</p>
+        <p style="margin-top:8px"><b>Về:</b> VJ829 — Osaka (KIX) → HCM (SGN) · 09:30 → 13:00 · 4/9/2026 · Eco</p>
+        <p style="margin-top:8px"><b>Hãng:</b> VietJet Air · 3 người · 4 ngày đầy đủ</p>
+      </div>
+    </details>
+    <details class="acc">
+      <summary>Khách sạn — Khu Namba/Shinsaibashi, Osaka</summary>
+      <div class="body">Gợi ý ở khu Namba hoặc Shinsaibashi — trung tâm nhất Osaka, tiện metro đi mọi hướng. 4 đêm (31/8–4/9/2026).<br><a href="https://maps.google.com/?q=Namba+Osaka" target="_blank" style="color:var(--gold)">Mở Maps →</a></div>
+    </details>
+    <details class="acc">
+      <summary>Ghi chú di chuyển</summary>
+      <div class="body">Mua <b>ICOCA IC card</b> ngay tại sân bay KIX (quầy tàu điện). Từ KIX về Namba: Haruka Express ~50 phút · ¥2,490. Ra sân bay: Nankai Rapi:t từ Namba → KIX ~45 phút · ¥1,430. Dùng ICOCA cho mọi chuyến metro/bus trong Osaka. Day trip Kyoto: JR Rapid ¥560/chiều · 28 phút.</div>
+    </details>
+  </div>
+</section>
+
+<footer>
+  <div class="jp">良い旅を</div>
+  <div>Lịch trình 4 ngày đầy đủ · Osaka · 31/8 – 4/9/2026 · 3 người</div>
+</footer>
+
+<!-- Modal -->
+<div class="modal" id="modal">
+  <div class="modal-content">
+    <h3 id="modalTitle">Add Activity</h3>
+    <div id="modalBody"></div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-primary" id="modalSave">Save</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal" id="placeModal" onclick="if(event.target===this)closePlaceModal()">
+  <div class="modal-content" style="max-width:640px;padding:0;overflow:hidden">
+    <div id="placeModalBody"></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ============================================================
+   DATA — REAL Osaka / Kyoto / Nara locations
+   ============================================================ */
+const HOTEL = {
+  name:"Khách sạn khu Namba/Shinsaibashi",
+  address:"Namba hoặc Shinsaibashi, Chuo Ward, Osaka",
+  lat:34.6724, lng:135.5012,
+  maps:"https://maps.google.com/?q=Namba+Osaka",
+  web:"https://www.osaka-info.jp/"
+};
+
+/* ============================================================
+   DATA — REAL Osaka / Kyoto locations (Osaka 4-day trip)
+   ============================================================ */
+
+const PLACES = [
+  // ===== ATTRACTIONS (Osaka) =====
+  {id:"p1",cat:"attraction",city:"Osaka",name:"Osaka Castle",address:"1-1 Osakajo, Chuo Ward, Osaka",lat:34.6873,lng:135.5262,hours:"09:00–17:00",cost:"¥600",spend:"¥600",img:"https://images.unsplash.com/photo-1590559899731-a382839e5549?w=800&q=80",desc:"Hideyoshi's iconic 16th-century stronghold rising above moats and cherry-tree parks. Skip the keep interior — the grounds at golden hour are the prize.",maps:"https://maps.google.com/?q=Osaka+Castle",web:"https://www.osakacastle.net/"},
+  {id:"p2",cat:"attraction",city:"Osaka",name:"Umeda Sky Building",address:"1-1-88 Oyodonaka, Kita Ward, Osaka",lat:34.7053,lng:135.4904,hours:"09:30–22:30",cost:"¥1,500",spend:"¥1,500",img:"https://images.unsplash.com/photo-1542051841857-5f90071e7989?w=800&q=80",desc:"Twin towers bridged by the floating Kuchu Teien observatory — Osaka's best 360° night panorama.",maps:"https://maps.google.com/?q=Umeda+Sky+Building",web:"https://www.skybldg.co.jp/en/"},
+  {id:"p3",cat:"attraction",city:"Osaka",name:"Dotonbori Riverside",address:"Dotonbori, Chuo Ward, Osaka",lat:34.6687,lng:135.5013,hours:"24h",cost:"Free",spend:"¥0",img:"https://images.unsplash.com/photo-1554797589-7241bb691973?w=800&q=80",desc:"Neon-lit canal lined with Glico, Kani Doraku and a hundred izakayas. Walk it at 21:00.",maps:"https://maps.google.com/?q=Dotonbori",web:"https://www.dotonbori.or.jp/en/"},
+  {id:"p4",cat:"attraction",city:"Osaka",name:"Shitennoji Temple",address:"1-11-18 Shitennoji, Tennoji Ward, Osaka",lat:34.6544,lng:135.5167,hours:"08:30–16:30",cost:"¥300",spend:"¥300",img:"https://images.unsplash.com/photo-1528360983277-13d401cdc186?w=800&q=80",desc:"Japan's oldest officially-administered temple, founded 593 AD. Quiet five-story pagoda and stone garden.",maps:"https://maps.google.com/?q=Shitennoji+Temple",web:"https://www.shitennoji.or.jp/"},
+  {id:"p5",cat:"attraction",city:"Osaka",name:"Sumiyoshi Taisha",address:"2-9-89 Sumiyoshi, Sumiyoshi Ward, Osaka",lat:34.6122,lng:135.4933,hours:"06:00–17:00",cost:"Free",spend:"¥0",img:"https://images.unsplash.com/photo-1545569341-9eb8b30979d9?w=800&q=80",desc:"Vermilion arched bridge over koi pond — the Sumiyoshi-zukuri architecture predates Buddhist influence.",maps:"https://maps.google.com/?q=Sumiyoshi+Taisha",web:"https://www.sumiyoshitaisha.net/"},
+  {id:"p6",cat:"attraction",city:"Osaka",name:"Nakanoshima Museum of Art",address:"4-3-1 Nakanoshima, Kita Ward, Osaka",lat:34.6921,lng:135.4925,hours:"10:00–17:00, closed Mon",cost:"¥1,800",spend:"¥1,800",img:"https://images.unsplash.com/photo-1577720580479-7d839d829c73?w=800&q=80",desc:"Black-cube minimalist museum opened 2022 — strong 20th-century Japanese design collection.",maps:"https://maps.google.com/?q=Nakanoshima+Museum+of+Art",web:"https://nakka-art.jp/"},
+  {id:"p7",cat:"attraction",city:"Osaka",name:"Namba Yasaka Shrine",address:"2-9-19 Motomachi, Naniwa Ward, Osaka",lat:34.6630,lng:135.4961,hours:"06:30–17:00",cost:"Free",spend:"¥0",img:"https://images.unsplash.com/photo-1480796927426-f609979314bd?w=800&q=80",desc:"Giant 12-meter lion-head stage said to swallow misfortune — surreal and Instagram-iconic.",maps:"https://maps.google.com/?q=Namba+Yasaka+Shrine",web:"https://nambayasaka.jp/"},
+  {id:"p8",cat:"attraction",city:"Osaka",name:"Hozenji Yokocho",address:"1-2-16 Namba, Chuo Ward, Osaka",lat:34.6685,lng:135.5010,hours:"24h",cost:"Free",spend:"¥0",img:"https://images.unsplash.com/photo-1565967511849-76a60a516170?w=800&q=80",desc:"Cobblestone alley behind Dotonbori — moss-covered Mizukake Fudo statue, hidden bars.",maps:"https://maps.google.com/?q=Hozenji+Yokocho",web:"https://www.osaka-info.jp/en/page/listings-hozenji-temple"},
+  {id:"p9",cat:"attraction",city:"Osaka",name:"Nakazakicho District",address:"Nakazakicho, Kita Ward, Osaka",lat:34.7081,lng:135.5083,hours:"24h",cost:"Free",spend:"¥0",img:"https://images.unsplash.com/photo-1528360983277-13d401cdc186?w=800&q=80",desc:"Post-war wooden houses repurposed as galleries, vintage shops and indie cafés. Osaka's Daikanyama.",maps:"https://maps.google.com/?q=Nakazakicho",web:"https://osaka-info.jp/en/spot/nakazakicho/"},
+  {id:"p10",cat:"attraction",city:"Osaka",name:"Tsutenkaku Tower",address:"1-18-6 Ebisuhigashi, Naniwa Ward, Osaka",lat:34.6524,lng:135.5063,hours:"10:00–20:00",cost:"¥900",spend:"¥900",img:"https://images.unsplash.com/photo-1542931287-023b922fa89b?w=800&q=80",desc:"1956 retro tower over the Shinsekai 'New World' district — old-Osaka kitsch at its finest.",maps:"https://maps.google.com/?q=Tsutenkaku",web:"https://www.tsutenkaku.co.jp/"},
+
+  // ===== ATTRACTIONS (Kyoto) =====
+  {id:"p11",cat:"attraction",city:"Kyoto",name:"Fushimi Inari Taisha",address:"68 Fukakusa Yabunouchicho, Fushimi Ward, Kyoto",lat:34.9671,lng:135.7727,hours:"24h",cost:"Free",spend:"¥0",img:"https://images.unsplash.com/photo-1478436127897-769e1538f1a2?w=800&q=80",desc:"Ten thousand vermilion torii winding up Mount Inari. Arrive by 07:30 to walk the upper paths in solitude.",maps:"https://maps.google.com/?q=Fushimi+Inari+Taisha",web:"https://inari.jp/"},
+  {id:"p12",cat:"attraction",city:"Kyoto",name:"Kiyomizu-dera",address:"1-294 Kiyomizu, Higashiyama Ward, Kyoto",lat:34.9949,lng:135.7851,hours:"06:00–18:00",cost:"¥500",spend:"¥500",img:"https://images.unsplash.com/photo-1493997181344-712f2f19d87a?w=800&q=80",desc:"Wooden stage on cypress pillars over the hillside — UNESCO site with sweeping city view.",maps:"https://maps.google.com/?q=Kiyomizu-dera",web:"https://www.kiyomizudera.or.jp/en/"},
+  {id:"p13",cat:"attraction",city:"Kyoto",name:"Ninenzaka & Sannenzaka",address:"Masuyacho, Higashiyama Ward, Kyoto",lat:34.9970,lng:135.7820,hours:"24h",cost:"Free",spend:"¥0",img:"https://images.unsplash.com/photo-1528164344705-47542687000d?w=800&q=80",desc:"Sloping stone-paved lanes lined with machiya teahouses and crafts shops — the postcard Kyoto.",maps:"https://maps.google.com/?q=Sannenzaka",web:"https://kyoto.travel/en/see-and-do/sannenzaka"},
+  {id:"p14",cat:"attraction",city:"Kyoto",name:"Yasaka Shrine & Maruyama Park",address:"625 Gionmachi Kitagawa, Higashiyama Ward, Kyoto",lat:35.0036,lng:135.7785,hours:"24h",cost:"Free",spend:"¥0",img:"https://images.unsplash.com/photo-1606918801925-e2c914c4b503?w=800&q=80",desc:"Lantern-lit shrine bordering Gion's main park. Beautiful at dusk.",maps:"https://maps.google.com/?q=Yasaka+Shrine",web:"https://www.yasaka-jinja.or.jp/"},
+  {id:"p15",cat:"attraction",city:"Kyoto",name:"Gion District",address:"Gion, Higashiyama Ward, Kyoto",lat:35.0037,lng:135.7762,hours:"24h",cost:"Free",spend:"¥0",img:"https://images.unsplash.com/photo-1545569341-9eb8b30979d9?w=800&q=80",desc:"Geisha quarter — Hanamikoji street, ochaya teahouses and the famous Tatsumi bridge over the Shirakawa canal.",maps:"https://maps.google.com/?q=Gion",web:"https://www.gion.or.jp/"},
+  {id:"p16",cat:"attraction",city:"Kyoto",name:"Kinkaku-ji (Golden Pavilion)",address:"1 Kinkakujicho, Kita Ward, Kyoto",lat:35.0394,lng:135.7292,hours:"09:00–17:00",cost:"¥500",spend:"¥500",img:"https://images.unsplash.com/photo-1545569341-9eb8b30979d9?w=800&q=80",desc:"Gold-leaf Zen pavilion mirrored in a still pond. Famous, crowded, still magical.",maps:"https://maps.google.com/?q=Kinkakuji",web:"https://www.shokoku-ji.jp/kinkakuji/"},
+  {id:"p17",cat:"attraction",city:"Kyoto",name:"Arashiyama Bamboo Grove",address:"Sagatenryuji Susukinobabacho, Ukyo Ward, Kyoto",lat:35.0170,lng:135.6710,hours:"24h",cost:"Free",spend:"¥0",img:"https://images.unsplash.com/photo-1528164344705-47542687000d?w=800&q=80",desc:"Towering green corridor of moso bamboo. Arrive before 08:00 or after 16:30.",maps:"https://maps.google.com/?q=Arashiyama+Bamboo+Grove",web:"https://www.kyoto-arashiyama.com/"},
+  {id:"p18",cat:"attraction",city:"Kyoto",name:"Tenryu-ji Temple",address:"68 Sagatenryuji Susukinobabacho, Ukyo Ward, Kyoto",lat:35.0156,lng:135.6738,hours:"08:30–17:00",cost:"¥500",spend:"¥500",img:"https://images.unsplash.com/photo-1545569341-9eb8b30979d9?w=800&q=80",desc:"UNESCO Zen temple — Sogen Pond garden by Muso Soseki, unchanged for 700 years.",maps:"https://maps.google.com/?q=Tenryuji",web:"https://www.tenryuji.com/en/"},
+  {id:"p19",cat:"attraction",city:"Kyoto",name:"Nishiki Market",address:"Nishikikoji-dori, Nakagyo Ward, Kyoto",lat:35.0050,lng:135.7647,hours:"09:00–18:00",cost:"Free entry",spend:"¥1,500",img:"https://images.unsplash.com/photo-1554797589-7241bb691973?w=800&q=80",desc:"400-year-old covered market — pickles, tofu doughnuts, yuba, knife shops.",maps:"https://maps.google.com/?q=Nishiki+Market",web:"https://www.kyoto-nishiki.or.jp/"},
+  {id:"p20",cat:"attraction",city:"Kyoto",name:"Pontocho Alley",address:"Pontocho, Nakagyo Ward, Kyoto",lat:35.0084,lng:135.7708,hours:"17:00–late",cost:"Free",spend:"¥0",img:"https://images.unsplash.com/photo-1535138292930-69c19dc05080?w=800&q=80",desc:"Narrow lantern-lit alley along the Kamogawa — riverside dining, the soul of nightfall Kyoto.",maps:"https://maps.google.com/?q=Pontocho",web:"https://www.kyoto.travel/en/see-and-do/pontocho"},
+
+  // ===== ATTRACTIONS (Nara) =====
+  {id:"p21",cat:"attraction",city:"Nara",name:"Todai-ji Temple",address:"406-1 Zoshicho, Nara",lat:34.6890,lng:135.8398,hours:"07:30–17:30",cost:"¥800",spend:"¥800",img:"https://images.unsplash.com/photo-1528164344705-47542687000d?w=800&q=80",desc:"Daibutsuden — world's largest wooden building — houses the 15-meter Great Buddha. Awe-inducing scale.",maps:"https://maps.google.com/?q=Todaiji",web:"https://www.todaiji.or.jp/"},
+  {id:"p22",cat:"attraction",city:"Nara",name:"Nara Park (Deer)",address:"Zoshicho, Nara",lat:34.6851,lng:135.8430,hours:"24h",cost:"Free",spend:"¥0",img:"https://images.unsplash.com/photo-1528164344705-47542687000d?w=800&q=80",desc:"1,200 freely-roaming sika deer — buy shika-senbei wafers and watch them bow for treats.",maps:"https://maps.google.com/?q=Nara+Park",web:"https://www.pref.nara.jp/item/2604.htm"},
+  {id:"p23",cat:"attraction",city:"Nara",name:"Kasuga Taisha",address:"160 Kasuganocho, Nara",lat:34.6815,lng:135.8484,hours:"06:30–17:30",cost:"¥500",spend:"¥500",img:"https://images.unsplash.com/photo-1545569341-9eb8b30979d9?w=800&q=80",desc:"Three thousand bronze and stone lanterns through a mossy cedar forest. Otherworldly.",maps:"https://maps.google.com/?q=Kasuga+Taisha",web:"https://www.kasugataisha.or.jp/"},
+  {id:"p24",cat:"attraction",city:"Nara",name:"Kofuku-ji & Five-Story Pagoda",address:"48 Noboriojicho, Nara",lat:34.6831,lng:135.8316,hours:"09:00–17:00",cost:"¥700",spend:"¥700",img:"https://images.unsplash.com/photo-1528360983277-13d401cdc186?w=800&q=80",desc:"50-meter pagoda — Japan's second-tallest. Walk distance from Kintetsu Nara station.",maps:"https://maps.google.com/?q=Kofukuji",web:"https://www.kohfukuji.com/"},
+  {id:"p25",cat:"attraction",city:"Nara",name:"Naramachi Old Quarter",address:"Naramachi, Nara",lat:34.6792,lng:135.8294,hours:"24h",cost:"Free",spend:"¥0",img:"https://images.unsplash.com/photo-1528164344705-47542687000d?w=800&q=80",desc:"Edo-era machiya merchant houses converted into craft studios, sake bars, tiny museums.",maps:"https://maps.google.com/?q=Naramachi",web:"https://naramachiinfo.jp/"},
+  {id:"p26",cat:"attraction",city:"Osaka",name:"Abeno Harukas Observatory",address:"1-1-43 Abenosuji, Abeno Ward, Osaka",lat:34.6457,lng:135.5135,hours:"09:00–22:00",cost:"¥1,500",spend:"¥1,500",img:"https://images.unsplash.com/photo-1542051841857-5f90071e7989?w=800&q=80",desc:"Japan's 2nd-tallest building (300m). Glass-floor 'Edge the Harukas' for the brave.",maps:"https://maps.google.com/?q=Abeno+Harukas",web:"https://www.abenoharukas-300.jp/en/"},
+  {id:"p27",cat:"attraction",city:"Osaka",name:"Osaka Museum of Housing & Living",address:"6-4-20 Tenjinbashi, Kita Ward, Osaka",lat:34.7048,lng:135.5135,hours:"10:00–17:00, closed Tue",cost:"¥600",spend:"¥600",img:"https://images.unsplash.com/photo-1528164344705-47542687000d?w=800&q=80",desc:"Full-scale recreation of an 1830s Osaka street under a painted sky. Wear yukata to walk through.",maps:"https://maps.google.com/?q=Osaka+Museum+of+Housing+and+Living",web:"https://konjyakukan.com/"},
+  {id:"p28",cat:"attraction",city:"Osaka",name:"Minoh Falls",address:"Minoh Park, Minoh, Osaka",lat:34.8550,lng:135.4715,hours:"24h",cost:"Free",spend:"¥0",img:"https://images.unsplash.com/photo-1528360983277-13d401cdc186?w=800&q=80",desc:"33-meter waterfall 30 min north of Umeda — easy forest walk, autumn-leaf icon.",maps:"https://maps.google.com/?q=Minoh+Falls",web:"https://mino-park.jp/"},
+  {id:"p29",cat:"attraction",city:"Kyoto",name:"Philosopher's Path",address:"Tetsugaku-no-michi, Sakyo Ward, Kyoto",lat:35.0257,lng:135.7944,hours:"24h",cost:"Free",spend:"¥0",img:"https://images.unsplash.com/photo-1528164344705-47542687000d?w=800&q=80",desc:"2-km canal-side stroll connecting Ginkaku-ji and Nanzen-ji. Cherry trees in spring, hydrangeas in summer.",maps:"https://maps.google.com/?q=Philosophers+Path",web:"https://kyoto.travel/en/see-and-do/philosophers-path"},
+  {id:"p30",cat:"attraction",city:"Kyoto",name:"Ginkaku-ji (Silver Pavilion)",address:"2 Ginkakujicho, Sakyo Ward, Kyoto",lat:35.0270,lng:135.7983,hours:"08:30–17:00",cost:"¥500",spend:"¥500",img:"https://images.unsplash.com/photo-1545569341-9eb8b30979d9?w=800&q=80",desc:"Zen retreat of shogun Yoshimasa — meticulously raked sea-of-silver-sand garden.",maps:"https://maps.google.com/?q=Ginkakuji",web:"https://www.shokoku-ji.jp/ginkakuji/"},
+
+  // ===== CAFES =====
+  {id:"c1",cat:"cafe",city:"Osaka",name:"Mel Coffee Roasters",address:"1-21-15 Shinmachi, Nishi Ward, Osaka",lat:34.6790,lng:135.4948,hours:"10:00–18:00",cost:"¥700",spend:"¥900",img:"https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=800&q=80",desc:"Tiny specialty roaster, single-origin pour-overs by Aussie-trained owner. Minimalist concrete.",maps:"https://maps.google.com/?q=Mel+Coffee+Roasters+Osaka",web:"https://melcoffeeroasters.com/"},
+  {id:"c2",cat:"cafe",city:"Osaka",name:"Lilo Coffee Roasters",address:"1-10-28 Nishishinsaibashi, Chuo Ward, Osaka",lat:34.6724,lng:135.4988,hours:"10:00–22:00",cost:"¥600",spend:"¥850",img:"https://images.unsplash.com/photo-1442512595331-e89e73853f31?w=800&q=80",desc:"Shinsaibashi flagship — chemex bar, brutalist interior, late hours.",maps:"https://maps.google.com/?q=Lilo+Coffee+Roasters",web:"https://lilocoffee.com/"},
+  {id:"c3",cat:"cafe",city:"Osaka",name:"Brooklyn Roasting Company Kitahama",address:"1-6-26 Kitahama, Chuo Ward, Osaka",lat:34.6913,lng:135.5079,hours:"08:00–20:00",cost:"¥650",spend:"¥1,000",img:"https://images.unsplash.com/photo-1453614512568-c4024d13c247?w=800&q=80",desc:"Riverside warehouse café on the Tosabori — terrace seats over the water.",maps:"https://maps.google.com/?q=Brooklyn+Roasting+Company+Kitahama",web:"https://brooklynroasting.jp/"},
+  {id:"c4",cat:"cafe",city:"Osaka",name:"Takamura Wine & Coffee Roasters",address:"2-2-18 Edobori, Nishi Ward, Osaka",lat:34.6885,lng:135.4900,hours:"11:00–19:30, closed Wed",cost:"¥800",spend:"¥1,200",img:"https://images.unsplash.com/photo-1559305616-3f99cd43e353?w=800&q=80",desc:"Cathedral-ceiling warehouse split between fine wine and a giant Probat roaster.",maps:"https://maps.google.com/?q=Takamura+Wine+Coffee+Roasters",web:"https://takamuranet.com/"},
+  {id:"c5",cat:"cafe",city:"Osaka",name:"Streamer Coffee Company Shinsaibashi",address:"3-5-23 Minamisenba, Chuo Ward, Osaka",lat:34.6760,lng:135.5012,hours:"08:00–20:00",cost:"¥650",spend:"¥900",img:"https://images.unsplash.com/photo-1509042239860-f550ce710b93?w=800&q=80",desc:"Latte-art world champion's Osaka outpost. Try the Military Latte.",maps:"https://maps.google.com/?q=Streamer+Coffee+Shinsaibashi",web:"https://streamercoffee.com/"},
+  {id:"c6",cat:"cafe",city:"Osaka",name:"% Arabica Osaka",address:"1-9-22 Minamihorie, Nishi Ward, Osaka",lat:34.6736,lng:135.4937,hours:"09:00–19:00",cost:"¥550",spend:"¥850",img:"https://images.unsplash.com/photo-1521017432531-fbd92d768814?w=800&q=80",desc:"Kyoto-born brand's Horie store — Slayer espresso, pure-white minimalist box.",maps:"https://maps.google.com/?q=Arabica+Osaka+Horie",web:"https://arabica.coffee/"},
+  {id:"c7",cat:"cafe",city:"Kyoto",name:"% Arabica Kyoto Higashiyama",address:"87-5 Hoshinocho, Higashiyama Ward, Kyoto",lat:34.9988,lng:135.7811,hours:"08:00–18:00",cost:"¥500",spend:"¥800",img:"https://images.unsplash.com/photo-1497935586351-b67a49e012bf?w=800&q=80",desc:"The Instagram-famous original — pagoda framed perfectly from the counter. Queue early.",maps:"https://maps.google.com/?q=Arabica+Kyoto+Higashiyama",web:"https://arabica.coffee/"},
+  {id:"c8",cat:"cafe",city:"Kyoto",name:"Blue Bottle Coffee Kyoto",address:"64 Kaminoguchicho, Sakyo Ward, Kyoto",lat:35.0118,lng:135.7913,hours:"09:00–18:00",cost:"¥600",spend:"¥1,000",img:"https://images.unsplash.com/photo-1442550528053-c431ecb55509?w=800&q=80",desc:"Renovated 100-year-old machiya near Nanzen-ji. Tatami corner upstairs.",maps:"https://maps.google.com/?q=Blue+Bottle+Coffee+Kyoto",web:"https://store.bluebottlecoffee.jp/"},
+  {id:"c9",cat:"cafe",city:"Kyoto",name:"Walden Woods Kyoto",address:"508-1 Sukyamachi, Shimogyo Ward, Kyoto",lat:34.9939,lng:135.7548,hours:"10:00–18:00",cost:"¥600",spend:"¥900",img:"https://images.unsplash.com/photo-1559925393-8be0ec4767c8?w=800&q=80",desc:"All-white temple-like café with a moss bench, inspired by Thoreau. Pure design pilgrimage.",maps:"https://maps.google.com/?q=Walden+Woods+Kyoto",web:"https://walden-woods.com/"},
+  {id:"c10",cat:"cafe",city:"Kyoto",name:"Kurasu Kyoto Stand",address:"552 Higashiaburanokojicho, Shimogyo Ward, Kyoto",lat:34.9882,lng:135.7531,hours:"08:00–18:00",cost:"¥550",spend:"¥800",img:"https://images.unsplash.com/photo-1511920170033-f8396924c348?w=800&q=80",desc:"Specialty stand near Kyoto Station — guest roasters rotated every two weeks.",maps:"https://maps.google.com/?q=Kurasu+Kyoto+Stand",web:"https://kurasu.kyoto/"},
+  {id:"c11",cat:"cafe",city:"Kyoto",name:"% Arabica Arashiyama",address:"3-47 Sagatenryuji Susukinobabacho, Ukyo Ward, Kyoto",lat:35.0145,lng:135.6740,hours:"08:00–18:00",cost:"¥500",spend:"¥800",img:"https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=800&q=80",desc:"Riverside outpost on the Katsura — drink your latte facing Togetsukyo bridge.",maps:"https://maps.google.com/?q=Arabica+Arashiyama",web:"https://arabica.coffee/"},
+  {id:"c12",cat:"cafe",city:"Nara",name:"Bolik Coffee",address:"5 Nakashinyacho, Nara",lat:34.6815,lng:135.8295,hours:"11:00–19:00, closed Wed",cost:"¥600",spend:"¥900",img:"https://images.unsplash.com/photo-1521017432531-fbd92d768814?w=800&q=80",desc:"Renovated kominka in Naramachi — single-origin hand-drip, vinyl jazz, wabi-sabi mood.",maps:"https://maps.google.com/?q=Bolik+Coffee+Nara",web:"https://bolik-coffee.com/"},
+  {id:"c13",cat:"cafe",city:"Osaka",name:"Cafe Hokorobi (Nakazakicho)",address:"1-3-12 Nakazakinishi, Kita Ward, Osaka",lat:34.7088,lng:135.5066,hours:"12:00–19:00, closed Mon",cost:"¥800",spend:"¥1,200",img:"https://images.unsplash.com/photo-1559305616-3f99cd43e353?w=800&q=80",desc:"Old wooden house with a hidden garden — handmade chiffon cake and herbal teas.",maps:"https://maps.google.com/?q=Cafe+Hokorobi",web:"https://osaka-info.jp/"},
+  {id:"c14",cat:"cafe",city:"Kyoto",name:"Vermillion espresso bar.",address:"31-1 Fukakusa Inariontomaecho, Fushimi Ward, Kyoto",lat:34.9685,lng:135.7708,hours:"09:00–17:00, closed Tue",cost:"¥600",spend:"¥1,000",img:"https://images.unsplash.com/photo-1453614512568-c4024d13c247?w=800&q=80",desc:"Tucked steps from Fushimi Inari — Melbourne-style flat whites and a pond-facing deck. Perfect post-shrine reward.",maps:"https://maps.google.com/?q=Vermillion+espresso+bar",web:"https://vermillioncafe.com/"},
+  {id:"c15",cat:"cafe",city:"Osaka",name:"Sumibi Coffee",address:"1-2-21 Tenjinbashi, Kita Ward, Osaka",lat:34.6961,lng:135.5118,hours:"10:00–19:00",cost:"¥700",spend:"¥1,000",img:"https://images.unsplash.com/photo-1442512595331-e89e73853f31?w=800&q=80",desc:"Charcoal-roasted beans, deep-amber siphon coffee in a tiny 6-seat counter. A ritual.",maps:"https://maps.google.com/?q=Sumibi+Coffee+Osaka",web:"https://www.osaka-info.jp/"},
+
+  // ===== RESTAURANTS =====
+  {id:"r1",cat:"restaurant",city:"Osaka",name:"Mizuno (Okonomiyaki)",address:"1-4-15 Dotonbori, Chuo Ward, Osaka",lat:34.6685,lng:135.5016,hours:"11:00–22:00",cost:"¥1,500–2,500",spend:"¥2,200",img:"https://images.unsplash.com/photo-1617196034796-73dfa7b1fd56?w=800&q=80",desc:"Michelin Bib Gourmand. Yamaimo-yaki — fluffier than any pancake you've eaten.",maps:"https://maps.google.com/?q=Mizuno+Okonomiyaki",web:"https://mizuno-osaka.com/"},
+  {id:"r2",cat:"restaurant",city:"Osaka",name:"Kani Doraku Honten",address:"1-6-18 Dotonbori, Chuo Ward, Osaka",lat:34.6685,lng:135.5020,hours:"11:00–22:00",cost:"¥4,000–8,000",spend:"¥5,500",img:"https://images.unsplash.com/photo-1559339352-11d035aa65de?w=800&q=80",desc:"The giant moving crab. Tasting-style kaiseki built around king crab.",maps:"https://maps.google.com/?q=Kani+Doraku+Honten",web:"https://douraku.co.jp/"},
+  {id:"r3",cat:"restaurant",city:"Osaka",name:"Daruma Shinsekai Honten (Kushikatsu)",address:"2-3-9 Ebisuhigashi, Naniwa Ward, Osaka",lat:34.6531,lng:135.5061,hours:"11:00–22:30",cost:"¥2,000–3,500",spend:"¥2,800",img:"https://images.unsplash.com/photo-1606471191009-63a4cbac4a52?w=800&q=80",desc:"Original 1929 kushikatsu house — remember the no-double-dipping rule.",maps:"https://maps.google.com/?q=Daruma+Shinsekai+Honten",web:"https://kushikatu-daruma.com/"},
+  {id:"r4",cat:"restaurant",city:"Osaka",name:"Harukoma Sushi (Tenjinbashi)",address:"1-17-18 Tenjinbashi, Kita Ward, Osaka",lat:34.6960,lng:135.5117,hours:"11:00–21:30",cost:"¥3,000–5,000",spend:"¥3,800",img:"https://images.unsplash.com/photo-1579871494447-9811cf80d66c?w=800&q=80",desc:"Counter sushi on the longest shopping arcade in Japan. Locals' lunchtime line.",maps:"https://maps.google.com/?q=Harukoma+Sushi",web:"https://www.harukomasushi.com/"},
+  {id:"r5",cat:"restaurant",city:"Osaka",name:"Imai Honten (Kitsune Udon)",address:"1-7-22 Dotonbori, Chuo Ward, Osaka",lat:34.6685,lng:135.5023,hours:"11:30–22:00, closed Wed",cost:"¥900–1,800",spend:"¥1,300",img:"https://images.unsplash.com/photo-1569718212165-3a8278d5f624?w=800&q=80",desc:"Centennial udon house. Clear kombu-dashi broth, sweet aburaage. Sit by the koi pond.",maps:"https://maps.google.com/?q=Imai+Honten+Dotonbori",web:"https://www.d-imai.com/"},
+  {id:"r6",cat:"restaurant",city:"Osaka",name:"Matsusakagyu Yakiniku M",address:"3-5-23 Minamisenba, Chuo Ward, Osaka",lat:34.6755,lng:135.5008,hours:"17:00–23:00",cost:"¥8,000–15,000",spend:"¥10,000",img:"https://images.unsplash.com/photo-1558030006-450675393462?w=800&q=80",desc:"A5 Matsusaka wagyu, course menu, premium experience. Reserve.",maps:"https://maps.google.com/?q=Matsusakagyu+Yakiniku+M+Shinsaibashi",web:"https://matsusakagyu-m.com/"},
+  {id:"r7",cat:"restaurant",city:"Osaka",name:"Endo Sushi (Osaka Central Market)",address:"1-1-86 Noda, Fukushima Ward, Osaka",lat:34.6889,lng:135.4763,hours:"05:00–14:00, closed Sun",cost:"¥1,500–3,000",spend:"¥2,500",img:"https://images.unsplash.com/photo-1579871494447-9811cf80d66c?w=800&q=80",desc:"Since 1907. Five-piece nigiri sets served straight from the fish market.",maps:"https://maps.google.com/?q=Endo+Sushi+Osaka",web:"https://endo-sushi.com/"},
+  {id:"r8",cat:"restaurant",city:"Kyoto",name:"Menbaka Fire Ramen",address:"757-2 Minamiiseyacho, Kamigyo Ward, Kyoto",lat:35.0327,lng:135.7611,hours:"11:30–14:30, 17:30–20:30, closed Wed",cost:"¥1,200–1,800",spend:"¥1,500",img:"https://images.unsplash.com/photo-1623341214825-9f4f963727da?w=800&q=80",desc:"Flame-ignited negi ramen — equal parts spectacle and exquisite broth.",maps:"https://maps.google.com/?q=Menbaka+Fire+Ramen",web:"https://www.menbakaichidai.com/"},
+  {id:"r9",cat:"restaurant",city:"Kyoto",name:"Gion Karyo (Kaiseki)",address:"570-235 Gionmachi Minamigawa, Higashiyama Ward, Kyoto",lat:35.0029,lng:135.7768,hours:"12:00–14:30, 17:30–22:00",cost:"¥6,000–12,000",spend:"¥8,500",img:"https://images.unsplash.com/photo-1606491956689-2ea866880c84?w=800&q=80",desc:"Accessible Gion kaiseki — modern presentation, seasonal Kyo-vegetables.",maps:"https://maps.google.com/?q=Gion+Karyo",web:"https://www.kyoto-karyo.com/"},
+  {id:"r10",cat:"restaurant",city:"Kyoto",name:"Issen Yoshoku",address:"238 Gionmachi Kitagawa, Higashiyama Ward, Kyoto",lat:35.0036,lng:135.7763,hours:"11:00–03:00",cost:"¥800–1,200",spend:"¥1,000",img:"https://images.unsplash.com/photo-1617196034796-73dfa7b1fd56?w=800&q=80",desc:"100-year-old single-dish Kyoto-style okonomiyaki. Quirky mannequin-filled interior.",maps:"https://maps.google.com/?q=Issen+Yoshoku",web:"https://issen-yosyoku.co.jp/"},
+  {id:"r11",cat:"restaurant",city:"Kyoto",name:"Honke Owariya (Soba, est. 1465)",address:"322 Niomontsukinukecho, Nakagyo Ward, Kyoto",lat:35.0140,lng:135.7613,hours:"11:00–19:00",cost:"¥1,200–2,500",spend:"¥1,800",img:"https://images.unsplash.com/photo-1569718212165-3a8278d5f624?w=800&q=80",desc:"Soba house in continuous operation since the Muromachi period. Try the Houraisoba tower.",maps:"https://maps.google.com/?q=Honke+Owariya",web:"https://honke-owariya.co.jp/"},
+  {id:"r12",cat:"restaurant",city:"Kyoto",name:"Ippodo Tea (Kaboku Tearoom)",address:"Teramachi-dori, Nakagyo Ward, Kyoto",lat:35.0157,lng:135.7651,hours:"10:00–17:00",cost:"¥1,000–1,800",spend:"¥1,400",img:"https://images.unsplash.com/photo-1577003833619-76bbd7f82948?w=800&q=80",desc:"Whisk your own matcha with a wagashi pairing in this 300-year-old tea merchant's tasting room.",maps:"https://maps.google.com/?q=Ippodo+Tea+Kaboku",web:"https://global.ippodo-tea.co.jp/"},
+  {id:"r13",cat:"restaurant",city:"Nara",name:"Edogawa Naramachi (Unagi)",address:"43 Shimomikadocho, Nara",lat:34.6818,lng:135.8316,hours:"11:00–21:00",cost:"¥3,000–6,000",spend:"¥4,200",img:"https://images.unsplash.com/photo-1580822184713-fc5400e7fe10?w=800&q=80",desc:"Charcoal-grilled eel in a kominka courtyard. The hitsumabushi rice bowl is the move.",maps:"https://maps.google.com/?q=Edogawa+Naramachi",web:"https://unagi-edogawa.com/"},
+  {id:"r14",cat:"restaurant",city:"Nara",name:"Mahoroba Daibutsu Pudding",address:"7-1 Nishimikadocho, Nara",lat:34.6824,lng:135.8311,hours:"09:30–19:00",cost:"¥450–700",spend:"¥600",img:"https://images.unsplash.com/photo-1551024601-bec78aea704b?w=800&q=80",desc:"Iconic glass-jar custard pudding — souvenir-grade dessert worth the detour.",maps:"https://maps.google.com/?q=Mahoroba+Daibutsu+Pudding",web:"https://daibutsu-purin.com/"},
+  {id:"r15",cat:"restaurant",city:"Osaka",name:"Wanaka Sennichimae (Takoyaki)",address:"11-19 Nanba Sennichimae, Chuo Ward, Osaka",lat:34.6663,lng:135.5022,hours:"10:30–22:30",cost:"¥600–1,000",spend:"¥800",img:"https://images.unsplash.com/photo-1554797589-7241bb691973?w=800&q=80",desc:"One of Osaka's takoyaki greats — crisp shell, molten dashi center.",maps:"https://maps.google.com/?q=Wanaka+Sennichimae",web:"https://takoyaki-wanaka.com/"},
+  {id:"r16",cat:"restaurant",city:"Osaka",name:"Rikuro's Cheesecake (Namba)",address:"3-2-28 Namba, Chuo Ward, Osaka",lat:34.6669,lng:135.5009,hours:"09:00–22:00",cost:"¥965/whole cake",spend:"¥965",img:"https://images.unsplash.com/photo-1565958011703-44f9829ba187?w=800&q=80",desc:"Jiggly soufflé-style cheesecake straight from the oven every 15 minutes.",maps:"https://maps.google.com/?q=Rikuros+Namba",web:"https://www.rikuro.co.jp/"},
+  {id:"r17",cat:"restaurant",city:"Osaka",name:"Hariju (Sukiyaki, Dotonbori)",address:"1-9-17 Dotonbori, Chuo Ward, Osaka",lat:34.6685,lng:135.5026,hours:"12:00–21:30",cost:"¥6,000–12,000",spend:"¥9,000",img:"https://images.unsplash.com/photo-1606491956689-2ea866880c84?w=800&q=80",desc:"1869 sukiyaki institution. Tatami private rooms, wagyu cooked tableside by waitresses.",maps:"https://maps.google.com/?q=Hariju+Dotonbori",web:"https://www.hariju.co.jp/"},
+  {id:"r18",cat:"restaurant",city:"Kyoto",name:"Nishiki Warai (Okonomiyaki)",address:"599 Nakauoyacho, Nakagyo Ward, Kyoto",lat:35.0052,lng:135.7644,hours:"11:30–22:00",cost:"¥1,200–2,200",spend:"¥1,800",img:"https://images.unsplash.com/photo-1617196034796-73dfa7b1fd56?w=800&q=80",desc:"Inside Nishiki market — Kyoto-style mochi-cheese okonomiyaki at hot plates.",maps:"https://maps.google.com/?q=Nishiki+Warai",web:"https://warai.jp/"},
+  {id:"r19",cat:"restaurant",city:"Osaka",name:"Yakiniku Toraji (Shinsaibashi)",address:"1-7-1 Shinsaibashisuji, Chuo Ward, Osaka",lat:34.6735,lng:135.5012,hours:"11:30–23:00",cost:"¥4,000–8,000",spend:"¥5,500",img:"https://images.unsplash.com/photo-1558030006-450675393462?w=800&q=80",desc:"Reliable wagyu set menus with hanging-style tongue and harami cuts.",maps:"https://maps.google.com/?q=Yakiniku+Toraji+Shinsaibashi",web:"https://www.ebisu-toraji.com/"},
+  {id:"r20",cat:"restaurant",city:"Osaka",name:"Fukutaro (Negiyaki)",address:"2-3-17 Sennichimae, Chuo Ward, Osaka",lat:34.6669,lng:135.5021,hours:"17:00–24:00",cost:"¥1,500–2,500",spend:"¥2,000",img:"https://images.unsplash.com/photo-1617196034796-73dfa7b1fd56?w=800&q=80",desc:"Spring-onion-stuffed cousin of okonomiyaki — a Sennichimae institution since 1939.",maps:"https://maps.google.com/?q=Fukutaro+Osaka",web:"https://2951.jp/"},
+
+  // ===== SHOPPING =====
+  {id:"s1",cat:"shopping",city:"Osaka",name:"Shinsaibashi-suji Arcade",address:"Shinsaibashisuji, Chuo Ward, Osaka",lat:34.6726,lng:135.5008,hours:"11:00–21:00",cost:"Free entry",spend:"¥5,000",img:"https://images.unsplash.com/photo-1555529902-5261145633bf?w=800&q=80",desc:"600m covered arcade — fashion, cosmetics, Uniqlo flagship, Daimaru depachika.",maps:"https://maps.google.com/?q=Shinsaibashi+Suji",web:"https://www.shinsaibashi.or.jp/"},
+  {id:"s2",cat:"shopping",city:"Osaka",name:"Amerikamura (Triangle Park)",address:"2 Nishishinsaibashi, Chuo Ward, Osaka",lat:34.6724,lng:135.4984,hours:"11:00–20:00",cost:"Free entry",spend:"¥4,000",img:"https://images.unsplash.com/photo-1483985988355-763728e1935b?w=800&q=80",desc:"Osaka's Harajuku — vintage stores, streetwear, indie sneaker spots.",maps:"https://maps.google.com/?q=Amerikamura",web:"https://americamura.jp/"},
+  {id:"s3",cat:"shopping",city:"Osaka",name:"Lucua Osaka (Umeda)",address:"3-1-3 Umeda, Kita Ward, Osaka",lat:34.7022,lng:135.4960,hours:"10:30–20:30",cost:"Free entry",spend:"¥6,000",img:"https://images.unsplash.com/photo-1555529902-5261145633bf?w=800&q=80",desc:"Twin-tower fashion mall above Osaka station. Beams, Margaret Howell, Snow Peak.",maps:"https://maps.google.com/?q=Lucua+Osaka",web:"https://www.lucua.jp/"},
+  {id:"s4",cat:"shopping",city:"Osaka",name:"Grand Front Osaka",address:"4-1 Ofukacho, Kita Ward, Osaka",lat:34.7037,lng:135.4949,hours:"10:00–21:00",cost:"Free entry",spend:"¥5,000",img:"https://images.unsplash.com/photo-1481437156560-3205f6a55735?w=800&q=80",desc:"Sleek design-focused mall — Tsutaya book café, Actus, Knot Watches.",maps:"https://maps.google.com/?q=Grand+Front+Osaka",web:"https://www.grandfront-osaka.jp/"},
+  {id:"s5",cat:"shopping",city:"Osaka",name:"Tenjinbashisuji Shopping Street",address:"Tenjinbashisuji, Kita Ward, Osaka",lat:34.6964,lng:135.5119,hours:"10:00–20:00",cost:"Free entry",spend:"¥3,000",img:"https://images.unsplash.com/photo-1555529902-5261145633bf?w=800&q=80",desc:"Japan's longest covered shopping street — 2.6km of local everyday shops, no tourists.",maps:"https://maps.google.com/?q=Tenjinbashisuji",web:"https://www.tenjin123.com/"},
+  {id:"s6",cat:"shopping",city:"Osaka",name:"Doguyasuji Kitchenware Street",address:"1-9 Namba Sennichimae, Chuo Ward, Osaka",lat:34.6660,lng:135.5023,hours:"09:00–18:00",cost:"Free entry",spend:"¥4,000",img:"https://images.unsplash.com/photo-1565958011703-44f9829ba187?w=800&q=80",desc:"Knives, copper pots, takoyaki pans, plastic food samples. Chef heaven.",maps:"https://maps.google.com/?q=Doguyasuji",web:"https://www.doguyasuji.or.jp/"},
+  {id:"s7",cat:"shopping",city:"Kyoto",name:"Kyoto Handicraft Center",address:"21 Shogoin Entomicho, Sakyo Ward, Kyoto",lat:35.0188,lng:135.7831,hours:"10:00–18:00",cost:"Free entry",spend:"¥5,000",img:"https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=800&q=80",desc:"Six floors of authentic Japanese crafts — woodblock prints, damascene, yukata.",maps:"https://maps.google.com/?q=Kyoto+Handicraft+Center",web:"https://www.kyotohandicraftcenter.com/"},
+  {id:"s8",cat:"shopping",city:"Kyoto",name:"D&Department Kyoto (Bukko-ji)",address:"397 Shinkaiseicho, Shimogyo Ward, Kyoto",lat:34.9985,lng:135.7626,hours:"11:00–18:00, closed Wed",cost:"Free entry",spend:"¥4,500",img:"https://images.unsplash.com/photo-1481437156560-3205f6a55735?w=800&q=80",desc:"Long-life design store set inside a working temple. Tableware, books, regional crafts.",maps:"https://maps.google.com/?q=D%26Department+Kyoto",web:"https://www.d-department.com/category/KYOTO.html"},
+  {id:"s9",cat:"shopping",city:"Kyoto",name:"Aritsugu Knives (Nishiki)",address:"219 Kajiyacho, Nakagyo Ward, Kyoto",lat:35.0049,lng:135.7643,hours:"09:00–17:30",cost:"From ¥10,000",spend:"¥15,000",img:"https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=800&q=80",desc:"Knife-makers since 1560. Free name engraving in kanji on purchase.",maps:"https://maps.google.com/?q=Aritsugu+Kyoto",web:"https://aritsugu.jp/"},
+  {id:"s10",cat:"shopping",city:"Osaka",name:"Loft Umeda",address:"3-1-3 Umeda, Kita Ward, Osaka",lat:34.7025,lng:135.4960,hours:"11:00–21:00",cost:"Free entry",spend:"¥3,500",img:"https://images.unsplash.com/photo-1483985988355-763728e1935b?w=800&q=80",desc:"Lifestyle department store — stationery, beauty, kitchen design objects.",maps:"https://maps.google.com/?q=Loft+Umeda",web:"https://www.loft.co.jp/"},
+
+  // ===== HIDDEN GEMS =====
+  {id:"h1",cat:"hidden",city:"Osaka",name:"Misono Building Rooftop",address:"2-3-9 Sennichimae, Chuo Ward, Osaka",lat:34.6668,lng:135.5024,hours:"18:00–02:00",cost:"Free entry",spend:"¥1,500",img:"https://images.unsplash.com/photo-1554797589-7241bb691973?w=800&q=80",desc:"Showa-era retro music & dance hall — neon-lit rooftop bars looking over Sennichimae.",maps:"https://maps.google.com/?q=Misono+Building+Osaka",web:""},
+  {id:"h2",cat:"hidden",city:"Osaka",name:"Orange Street (Tatchimachi)",address:"Tachimachi, Nishi Ward, Osaka",lat:34.6747,lng:135.4953,hours:"24h",cost:"Free",spend:"¥0",img:"https://images.unsplash.com/photo-1481437156560-3205f6a55735?w=800&q=80",desc:"Tree-lined design street — Scandinavian furniture, indie boutiques, slow-pour cafés.",maps:"https://maps.google.com/?q=Orange+Street+Osaka",web:""},
+  {id:"h3",cat:"hidden",city:"Osaka",name:"Hatchobori Bookstore Cafe",address:"1-7-12 Hatchobori, Chuo Ward, Osaka",lat:34.6814,lng:135.5147,hours:"12:00–20:00",cost:"¥600",spend:"¥1,200",img:"https://images.unsplash.com/photo-1481437156560-3205f6a55735?w=800&q=80",desc:"Independent bookshop-café with a courtyard — rare design titles in English.",maps:"https://maps.google.com/?q=Hatchobori+Osaka",web:""},
+  {id:"h4",cat:"hidden",city:"Kyoto",name:"Kennin-ji Twin Dragons Ceiling",address:"584 Komatsucho, Higashiyama Ward, Kyoto",lat:35.0015,lng:135.7732,hours:"10:00–17:00",cost:"¥600",spend:"¥600",img:"https://images.unsplash.com/photo-1545569341-9eb8b30979d9?w=800&q=80",desc:"Kyoto's oldest Zen temple — Koizumi Junsaku's spectacular twin-dragon ceiling.",maps:"https://maps.google.com/?q=Kenninji",web:"https://www.kenninji.jp/"},
+  {id:"h5",cat:"hidden",city:"Kyoto",name:"Honen-in Temple",address:"30 Shishigatani Goshonodancho, Sakyo Ward, Kyoto",lat:35.0241,lng:135.7977,hours:"06:00–16:00",cost:"Free",spend:"¥0",img:"https://images.unsplash.com/photo-1528360983277-13d401cdc186?w=800&q=80",desc:"Moss-covered thatched gate just off the Philosopher's Path. Almost no tourists.",maps:"https://maps.google.com/?q=Honenin",web:"https://www.honen-in.jp/"},
+  {id:"h6",cat:"hidden",city:"Kyoto",name:"Otoyo Shrine (Mouse Shrine)",address:"1 Shishigatani Miyanomaecho, Sakyo Ward, Kyoto",lat:35.0227,lng:135.7984,hours:"24h",cost:"Free",spend:"¥0",img:"https://images.unsplash.com/photo-1480796927426-f609979314bd?w=800&q=80",desc:"Off the Philosopher's Path — guarded by stone mice instead of foxes. Quiet, weird, charming.",maps:"https://maps.google.com/?q=Otoyo+Shrine+Kyoto",web:""},
+  {id:"h7",cat:"hidden",city:"Kyoto",name:"Sagano Scenic Romantic Train Station",address:"Sagatenryuji Kurumamichicho, Ukyo Ward, Kyoto",lat:35.0184,lng:135.6781,hours:"09:00–17:00",cost:"¥880",spend:"¥880",img:"https://images.unsplash.com/photo-1528360983277-13d401cdc186?w=800&q=80",desc:"Open-air vintage train winding through Hozugawa ravine. Book seats in advance.",maps:"https://maps.google.com/?q=Sagano+Romantic+Train",web:"https://www.sagano-kanko.co.jp/"},
+  {id:"h8",cat:"hidden",city:"Nara",name:"Mt. Wakakusa Sunset Hill",address:"469 Zoshicho, Nara",lat:34.6843,lng:135.8504,hours:"09:00–17:00 (Mar–Dec)",cost:"¥150",spend:"¥150",img:"https://images.unsplash.com/photo-1528360983277-13d401cdc186?w=800&q=80",desc:"Grassy hill above Todai-ji — easiest 30-min climb in Nara, best sunset view of the valley.",maps:"https://maps.google.com/?q=Mount+Wakakusa",web:""},
+  {id:"h9",cat:"hidden",city:"Osaka",name:"Karahori Shopping Street",address:"Karahori, Chuo Ward, Osaka",lat:34.6760,lng:135.5197,hours:"10:00–19:00",cost:"Free entry",spend:"¥2,000",img:"https://images.unsplash.com/photo-1555529902-5261145633bf?w=800&q=80",desc:"Long-form Showa-era arcade with antique shops and the Lemon Building. Zero tourists.",maps:"https://maps.google.com/?q=Karahori+Osaka",web:""},
+  {id:"h10",cat:"hidden",city:"Kyoto",name:"Kamogawa Delta (Demachiyanagi)",address:"Demachiyanagi, Sakyo Ward, Kyoto",lat:35.0286,lng:135.7723,hours:"24h",cost:"Free",spend:"¥0",img:"https://images.unsplash.com/photo-1528360983277-13d401cdc186?w=800&q=80",desc:"Where the Takano and Kamo rivers meet — locals picnic, kids hop stepping-stones at sunset.",maps:"https://maps.google.com/?q=Kamogawa+Delta",web:""}
+];
+
+const DEFAULT_ITINERARY = {
+  1:{
+    date:"CN 31/8/2026",title:"Nhận phòng & Dạo Namba",sub:"Sân bay · Dotonbori · Shinsaibashi · Izakaya",color:"#e8b4c3",
+    activities:[
+      {id:"d1a1",time:"08:30",end:"10:00",dur:"Sáng",title:"Đến Kansai Airport — Lấy hành lý",desc:"Mua IC card (ICOCA) tại sân bay để đi tàu/metro suốt chuyến. Đổi JPY sẵn.",transport:"di chuyển",line:"Haruka Express",station:"KIX → Osaka/Namba ~50 phút · ¥2,490/người",fare:"¥2,490/người",notes:"Mua ICOCA ngay tại quầy sân bay trước khi ra.",maps:"https://maps.google.com/?q=Kansai+International+Airport",web:"https://www.kansai-airport.or.jp/en"},
+      {id:"d1a2",time:"10:30",end:"11:30",dur:"Sáng",title:"Check-in khách sạn khu Namba/Shinsaibashi",desc:"Gợi ý: khu Namba hoặc Shinsaibashi — trung tâm, đi đâu cũng tiện metro. Gửi hành lý nếu chưa có phòng.",transport:"lưu trú",line:"—",station:"Namba/Shinsaibashi",fare:"—",notes:"",maps:"https://maps.google.com/?q=Namba+Osaka",web:"https://www.osaka-info.jp/"},
+      {id:"d1a3",time:"12:00",end:"13:00",dur:"1h",title:"Ăn trưa: Takoyaki Wanaka hoặc Ichimi",desc:"Takoyaki Osaka thứ thiệt ngay Dotonbori. Giá ~¥700–800/hộp. Ăn đứng ngoài phố luôn cho đúng cảm giác.",transport:"ăn uống",line:"",station:"",fare:"~¥800/người",notes:"Review rất cao, hàng dài nhưng xứng đáng.",maps:"https://maps.google.com/?q=Takoyaki+Wanaka+Dotonbori",web:"https://www.dotonbori.or.jp/"},
+      {id:"d1a4",time:"13:30",end:"15:30",dur:"2h",title:"Dotonbori + Hozenji Yokocho",desc:"Con phố ẩm thực nổi tiếng nhất Osaka. Ghé hẻm đá Hozenji Yokocho cổ kính, đền phủ rêu Mizukake Fudo — chụp ảnh rất đẹp, bình dân.",transport:"tham quan",line:"",station:"",fare:"Miễn phí",notes:"",maps:"https://maps.google.com/?q=Hozenji+Yokocho",web:"https://www.osaka-info.jp/"},
+      {id:"d1a5",time:"15:30",end:"17:00",dur:"1h30m",title:"Shinsaibashi-suji Shopping Street",desc:"Arcade mua sắm dài nhất Osaka, miễn phí dạo, giá bình dân. Tạt qua America-mura (Amemura) — street art, thời trang vintage độc đáo.",transport:"tham quan",line:"",station:"",fare:"Miễn phí",notes:"",maps:"https://maps.google.com/?q=Shinsaibashi+Suji",web:"https://www.shinsaibashi.or.jp/"},
+      {id:"d1a6",time:"17:30",end:"18:30",dur:"1h",title:"Cafe: % Arabica Osaka hoặc Horie Ogawa",desc:"% Arabica ở Shinsaibashi có view đẹp, cà phê chất lượng cao. Hoặc Horie — khu cafe indie rất local, đi bộ 10 phút.",transport:"cafe",line:"",station:"",fare:"~¥700/người",notes:"",maps:"https://maps.google.com/?q=Arabica+Osaka+Horie",web:"https://arabica.coffee/"},
+      {id:"d1a7",time:"19:00",end:"21:30",dur:"2h30m",title:"Tối: Kuromon Ichiba Market hoặc Izakaya Namba",desc:"Kuromon đóng ~18h nhưng quán xung quanh mở tối. Izakaya tự gọi bia, yakitori, rất local. ~¥2,000–3,000/người.",transport:"ăn uống",line:"",station:"",fare:"~¥2,500/người",notes:"",maps:"https://maps.google.com/?q=Kuromon+Market+Osaka",web:"https://kuromon.com/"}
+    ]
+  },
+  2:{
+    date:"T2 1/9/2026",title:"Osaka Castle & Nakazakicho",sub:"Lâu đài · Khu Art Indie · Umeda Sky Building",color:"#a23b3b",
+    activities:[
+      {id:"d2a1",time:"08:00",end:"09:00",dur:"Sáng",title:"Sáng: Konamon Museum cafe hoặc tiệm bánh mì Namba",desc:"Ăn sáng nhẹ gần khách sạn trước khi ra đường. Konbini (7-Eleven/Lawson) của Nhật cũng rất ngon và rẻ.",transport:"cafe",line:"Metro Tanimachi line → Tanimachi 4-chome ~15 phút",station:"Shinsaibashi → Tanimachi 4-chome",fare:"¥240/người",notes:"",maps:HOTEL.maps,web:""},
+      {id:"d2a2",time:"09:00",end:"11:30",dur:"2h30m",title:"Osaka Castle & Nishinomaru Garden",desc:"Lâu đài lịch sử 400 năm, công viên xung quanh miễn phí, vào lâu đài ¥600/người. Đi sớm tránh đông. Nishinomaru Garden view rất đẹp.",transport:"tham quan",line:"",station:"",fare:"¥600/người",notes:"Điểm mang tính biểu tượng, xứng đáng bỏ thời gian.",maps:"https://maps.google.com/?q=Osaka+Castle",web:"https://www.osakacastle.net/"},
+      {id:"d2a3",time:"12:30",end:"13:30",dur:"1h",title:"Ăn trưa: khu Nakatsu — ramen, curry Nhật",desc:"Khu dân sinh, ít khách du lịch, quán ngon thật sự. Ichiran Ramen nếu muốn ăn một mình chill, hoặc thử quán curry Nhật bình dân.",transport:"ăn uống",line:"Metro đến Nakatsu hoặc Nakazakicho ~20 phút",station:"Tanimachi 4-chome → Nakatsu",fare:"¥240/người",notes:"",maps:"https://maps.google.com/?q=Nakatsu+Osaka",web:""},
+      {id:"d2a4",time:"14:00",end:"16:30",dur:"2h30m",title:"Nakazakicho — khu phố nghệ thuật vintage",desc:"Hẻm nhỏ đầy gallery độc lập, shop vintage, tiệm thủ công. Rất local, ít bị thương mại hóa. Đi bộ khám phá tự do, miễn phí.",transport:"art · văn hoá",line:"",station:"",fare:"Miễn phí",notes:"Hidden gem của Osaka, dân mạng review rất cao.",maps:"https://maps.google.com/?q=Nakazakicho",web:"https://osaka-info.jp/en/spot/nakazakicho/"},
+      {id:"d2a5",time:"16:30",end:"17:30",dur:"1h",title:"Cafe: Haikara Coffee hoặc Onzieme trong Nakazakicho",desc:"Quán nằm trong nhà cũ cải tạo, decor cực đẹp, giá bình dân ~¥500–700. Ghé uống rồi dạo thêm hẻm xung quanh.",transport:"cafe",line:"",station:"",fare:"~¥600/người",notes:"",maps:"https://maps.google.com/?q=Nakazakicho+Osaka",web:""},
+      {id:"d2a6",time:"18:30",end:"20:00",dur:"1h30m",title:"Umeda Sky Building — tầng thượng",desc:"Toà nhà biểu tượng, đài quan sát ngoài trời ¥1,500/người. Ban đêm nhìn thành phố rất đẹp. Ngay gần đó có chợ đêm Harukas.",transport:"tham quan",line:"",station:"",fare:"¥1,500/người",notes:"",maps:"https://maps.google.com/?q=Umeda+Sky+Building",web:"https://www.skybldg.co.jp/en/"},
+      {id:"d2a7",time:"20:30",end:"22:00",dur:"1h30m",title:"Tối: Okonomiyaki Mizuno (Dotonbori)",desc:"Bánh xèo Osaka kiểu Kansai, tự tráng tại bàn hoặc đầu bếp làm. ~¥1,200–1,500/người. Đặt trước nếu đến cuối tuần.",transport:"ăn uống",line:"",station:"",fare:"~¥1,400/người",notes:"Món phải ăn ở Osaka, Mizuno huyền thoại 70+ năm.",maps:"https://maps.google.com/?q=Mizuno+Okonomiyaki",web:"https://mizuno-osaka.com/"}
+    ]
+  },
+  3:{
+    date:"T3 2/9/2026",title:"Day Trip Kyoto",sub:"Fushimi Inari · Higashiyama · Arashiyama · Shinsekai",color:"#7a8a5a",
+    activities:[
+      {id:"d3a1",time:"07:00",end:"08:30",dur:"Sáng",title:"Đi Kyoto — JR Shinkansen/Rapid",desc:"JR Shinkansen/Rapid từ Osaka → Kyoto · ¥560/người · 15–28 phút. Khởi hành sớm để tránh đông.",transport:"di chuyển",line:"JR Shinkansen/Rapid",station:"Osaka → Kyoto",fare:"¥560/người",notes:"",maps:"https://maps.google.com/?q=Kyoto+Station",web:"https://www.westjr.co.jp/"},
+      {id:"d3a2",time:"08:30",end:"10:30",dur:"2h",title:"Fushimi Inari Taisha",desc:"Ngàn cổng torii đỏ nối nhau lên núi — miễn phí hoàn toàn. Đi sớm 8h là vắng nhất, đẹp nhất. Leo lên tầm giữa núi (~30 phút) là đủ cảnh.",transport:"tham quan",line:"",station:"",fare:"Miễn phí",notes:"Top 1 Kyoto trên mọi trang review quốc tế.",maps:"https://maps.google.com/?q=Fushimi+Inari+Taisha",web:"https://inari.jp/"},
+      {id:"d3a3",time:"11:00",end:"13:00",dur:"2h",title:"Higashiyama — phố cổ truyền thống",desc:"Khu bảo tồn Sannen-zaka, Ninen-zaka — đường đá lát, nhà gỗ cũ, shop thủ công truyền thống. Ghé Yasaka Shrine, vào cổng miễn phí.",transport:"văn hoá",line:"Bus/tàu đến Higashiyama ~20 phút",station:"Fushimi Inari → Higashiyama",fare:"~¥250/người bus",notes:"",maps:"https://maps.google.com/?q=Higashiyama+Kyoto",web:""},
+      {id:"d3a4",time:"13:00",end:"14:00",dur:"1h",title:"Ăn trưa: tofu kaiseki hoặc soba Kyoto trong Higashiyama",desc:"Nhiều quán nhỏ bình dân ngay trong phố cổ. Thử tofu mềm Kyoto kiểu, giá set ~¥1,000–1,500. Hoặc mochi dọc đường ăn vặt.",transport:"ăn uống",line:"",station:"",fare:"~¥1,300/người",notes:"",maps:"https://maps.google.com/?q=Higashiyama+Kyoto",web:""},
+      {id:"d3a5",time:"14:30",end:"17:00",dur:"2h30m",title:"Arashiyama — rừng tre & Tenryu-ji",desc:"Rừng tre Sagano miễn phí, đi qua trong 10 phút nhưng rất đặc trưng. Vườn Tenryu-ji ¥500. Dạo sông Oi, thuê thuyền nếu thích ~¥1,200.",transport:"tham quan",line:"Bus 100 đến Arashiyama ~30 phút",station:"Higashiyama → Arashiyama",fare:"~¥250/người bus",notes:"Ảnh ở đây rất đặc sắc, khác hẳn Osaka.",maps:"https://maps.google.com/?q=Arashiyama+Bamboo+Grove",web:"https://www.tenryuji.com/en/"},
+      {id:"d3a6",time:"17:30",end:"19:00",dur:"1h30m",title:"Về Osaka — JR ~50 phút",desc:"JR về Osaka ~50 phút. Về tới trung tâm khoảng 19h.",transport:"di chuyển",line:"JR",station:"Kyoto → Osaka",fare:"¥560/người",notes:"",maps:"https://maps.google.com/?q=Osaka+Station",web:""},
+      {id:"d3a7",time:"19:30",end:"21:30",dur:"2h",title:"Tối: Shinsekai — khu phố retro Osaka",desc:"Khu cũ nhất Osaka, vẫn giữ không khí Showa. Ăn kushikatsu (xiên que chiên) tại đây — đặc sản số 1. ¥2,000–2,500 no bụng. Tháp Tsutenkaku chiều đèn đẹp.",transport:"ăn uống",line:"",station:"",fare:"~¥2,200/người",notes:"Bình dân, rất local, review cao, ít khách Tây.",maps:"https://maps.google.com/?q=Shinsekai+Osaka",web:"https://www.shinsekai.net/"}
+    ]
+  },
+  4:{
+    date:"T4 3/9/2026",title:"Tennoji & Mua Sắm",sub:"Vườn thú · Kuromon · Nipponbashi · Don Quijote",color:"#3a4a7a",
+    activities:[
+      {id:"d4a1",time:"09:00",end:"10:30",dur:"1h30m",title:"Tennoji Zoo & Tennoji Park",desc:"Công viên lớn, miễn phí dạo. Zoo ¥500 nếu thích. Gần đó là Abeno Harukas — toà nhà cao nhất Nhật Bản, đài quan sát ¥2,000.",transport:"tham quan",line:"",station:"",fare:"Miễn phí / ¥500 Zoo",notes:"",maps:"https://maps.google.com/?q=Tennoji+Park+Osaka",web:""},
+      {id:"d4a2",time:"10:30",end:"11:30",dur:"1h",title:"Cafe: Café de Crié hoặc Streamer Coffee Tennoji",desc:"Uống cà phê nhìn công viên. Streamer nếu muốn latte art, Crié nếu muốn rẻ yên tĩnh.",transport:"cafe",line:"Đi bộ hoặc metro về Namba ~15 phút",station:"",fare:"~¥600/người",notes:"",maps:"https://maps.google.com/?q=Tennoji+Osaka",web:""},
+      {id:"d4a3",time:"12:00",end:"14:00",dur:"2h",title:"Kuromon Ichiba — chợ ẩm thực trong nhà",desc:"'Bếp của Osaka' — 180+ quầy hàng hải sản tươi sống, sashimi, bánh crepe, wagyu nướng tại chỗ. Ăn vừa đi vừa thử. ~¥2,000 no bụng.",transport:"ăn uống",line:"",station:"",fare:"~¥2,000/người",notes:"Nhớ đi sáng-trưa, chiều nhiều quầy đóng.",maps:"https://maps.google.com/?q=Kuromon+Market+Osaka",web:"https://kuromon.com/"},
+      {id:"d4a4",time:"14:30",end:"16:30",dur:"2h",title:"Nipponbashi Den Den Town",desc:"Akihabara của Osaka — manga, anime, đồ điện tử, figure, retro games. Không cần mua, dạo và ngắm cũng thú vị. Rất đặc trưng Nhật Bản.",transport:"văn hoá",line:"",station:"",fare:"Miễn phí",notes:"",maps:"https://maps.google.com/?q=Nipponbashi+Den+Den+Town",web:""},
+      {id:"d4a5",time:"17:00",end:"19:00",dur:"2h",title:"Mua đồ về: Don Quijote Dotonbori",desc:"Donki mở đến 5h sáng, giá rẻ nhất Osaka cho snack, mỹ phẩm, quà lưu niệm. Tầng thượng có nhìn xuống Dotonbori rất đẹp.",transport:"mua sắm",line:"",station:"",fare:"—",notes:"",maps:"https://maps.google.com/?q=Don+Quijote+Dotonbori",web:"https://www.donki.com/"},
+      {id:"d4a6",time:"19:30",end:"21:30",dur:"2h",title:"Bữa tối cuối: Yakiniku / Shabu-shabu buffet",desc:"Nướng thịt Nhật tự nướng hoặc shabu-shabu buffet ~¥2,500–3,500/người. Nhiều quán xung quanh Namba, đặt qua Tabelog. Bữa cuối xứng đáng.",transport:"ăn uống",line:"",station:"",fare:"~¥3,000/người",notes:"",maps:"https://maps.google.com/?q=Yakiniku+Namba+Osaka",web:""}
+    ]
+  },
+  5:{
+    date:"T5 4/9/2026",title:"Check-out & Ra Sân Bay",sub:"Ăn sáng · Gửi hành lý · KIX · VJ829",color:"#5a7a6a",
+    activities:[
+      {id:"d5a1",time:"07:00",end:"07:30",dur:"30m",title:"Ăn sáng nhẹ gần khách sạn",desc:"Konbini Nhật buổi sáng rất ngon — onigiri, bánh mì, cà phê lon. Hoặc quán soba/udon 24h nếu muốn ngồi.",transport:"ăn uống",line:"",station:"",fare:"~¥500/người",notes:"",maps:HOTEL.maps,web:""},
+      {id:"d5a2",time:"07:30",end:"08:00",dur:"30m",title:"Check-out, gửi hành lý hoặc mang theo",desc:"Bay lúc 09:30, nên có mặt sân bay 07:30–08:00. Từ Namba lên Kansai Airport ~45 phút (Nankai Rapi:t ¥1,430). Đừng để muộn.",transport:"di chuyển",line:"Nankai Rapi:t Namba → Kansai Airport · 45 phút · Khởi hành chậm nhất 07:00",station:"Namba → KIX",fare:"¥1,430/người",notes:"",maps:"https://maps.google.com/?q=Kansai+International+Airport",web:"https://www.nankai.co.jp/en/highway/rapit.html"},
+      {id:"d5a3",time:"09:30",end:"13:00",dur:"chuyến về",title:"VJ829 Osaka → HCM, đến 13:00",desc:"Về nhà sau 4 ngày trọn vẹn!",transport:"chuyến về",line:"VietJet VJ829",station:"KIX → HCM",fare:"Đã đặt",notes:"",maps:"https://maps.google.com/?q=Kansai+International+Airport",web:"https://www.vietjetair.com/"}
+    ]
+  }
+};
+
+const DEFAULT_BUDGET = [
+  {cat:"Flights",item:"VJ828 HCM → Osaka (3 người, Deluxe)",day:0,amount:15000000,curr:"VND"},
+  {cat:"Flights",item:"VJ829 Osaka → HCM (3 người, Eco)",day:0,amount:9000000,curr:"VND"},
+  {cat:"Hotels",item:"Khách sạn Namba/Shinsaibashi × 4 đêm",day:0,amount:120000,curr:"JPY"},
+  {cat:"Transportation",item:"Haruka Express KIX → Osaka (3 người)",day:1,amount:7470,curr:"JPY"},
+  {cat:"Transportation",item:"Nankai Rapi:t về KIX (3 người)",day:5,amount:4290,curr:"JPY"},
+  {cat:"Transportation",item:"ICOCA top-up (3 × ¥5,000)",day:0,amount:15000,curr:"JPY"},
+  {cat:"Transportation",item:"JR Osaka–Kyoto khứ hồi (3 người)",day:3,amount:3360,curr:"JPY"},
+  {cat:"Food",item:"Ngày 1 — Dotonbori, Izakaya",day:1,amount:22000,curr:"JPY"},
+  {cat:"Food",item:"Ngày 2 — Osaka Castle area, Okonomiyaki",day:2,amount:18000,curr:"JPY"},
+  {cat:"Food",item:"Ngày 3 — Day trip Kyoto, Shinsekai kushikatsu",day:3,amount:25000,curr:"JPY"},
+  {cat:"Food",item:"Ngày 4 — Kuromon Market, Yakiniku",day:4,amount:28000,curr:"JPY"},
+  {cat:"Food",item:"Ngày 5 — Sáng sân bay",day:5,amount:3000,curr:"JPY"},
+  {cat:"Attractions",item:"Osaka Castle × 3",day:2,amount:1800,curr:"JPY"},
+  {cat:"Attractions",item:"Umeda Sky Building × 3",day:2,amount:4500,curr:"JPY"},
+  {cat:"Attractions",item:"Tenryu-ji + Abeno Harukas (chọn)",day:4,amount:5100,curr:"JPY"},
+  {cat:"Shopping",item:"Shinsaibashi + Nipponbashi + Don Quijote",day:4,amount:50000,curr:"JPY"},
+  {cat:"Emergency",item:"Cash buffer + taxi + tips",day:0,amount:20000,curr:"JPY"}
+];
+
+const DEFAULT_CHECKLISTS = {
+  Packing:[
+    {t:"Lightweight clothing for 30°C humid weather",d:false},
+    {t:"Walking shoes (broken in)",d:false},
+    {t:"Compact umbrella / packable rain jacket",d:false},
+    {t:"Light cardigan for trains/restaurants A/C",d:false},
+    {t:"Power adapter (Type A, 100V)",d:false},
+    {t:"Portable battery + charging cables",d:false},
+    {t:"Sunglasses & sunblock SPF 50",d:false},
+    {t:"Mini towel (handkerchief — Japan public toilets)",d:false}
+  ],
+  Travel:[
+    {t:"Confirm flight check-in 24h prior",d:false},
+    {t:"Order ICOCA + Pasmo IC cards",d:false},
+    {t:"Reserve Nankai Rapi:t seats (one-way)",d:false},
+    {t:"Reserve Ippodo tea ceremony (Day 2)",d:false},
+    {t:"Reserve Gion Karyo or Pontocho restaurant (Day 2)",d:false},
+    {t:"Download Google Maps offline (Osaka, Kyoto, Nara)",d:false},
+    {t:"Download Visit Japan Web QR before landing",d:false},
+    {t:"Activate roaming or pick up eSIM",d:false}
+  ],
+  Documents:[
+    {t:"Passport (valid ≥6 months)",d:false},
+    {t:"Print flight bookings",d:false},
+    {t:"Print hotel confirmations",d:false},
+    {t:"Travel insurance certificate",d:false},
+    {t:"Vaccination record",d:false},
+    {t:"Emergency contacts list",d:false},
+    {t:"Photocopy of passport (separate from original)",d:false}
+  ],
+  Medicine:[
+    {t:"Personal prescription medication (with doctor note)",d:false},
+    {t:"Painkillers (paracetamol/ibuprofen)",d:false},
+    {t:"Stomach / motion sickness tablets",d:false},
+    {t:"Allergy antihistamines",d:false},
+    {t:"Band-aids + antiseptic",d:false},
+    {t:"Insect repellent",d:false},
+    {t:"Electrolyte sachets",d:false}
+  ],
+  Custom:[
+    {t:"Camera + extra SD card + lens cloth",d:false},
+    {t:"Pocket notebook for journal entries",d:false},
+    {t:"Small gift for hotel staff (omiyage from VN)",d:false}
+  ]
+};
+
+const DEFAULT_JOURNAL = {
+  1:{notes:"",photos:[]},2:{notes:"",photos:[]},3:{notes:"",photos:[]},4:{notes:"",photos:[]},5:{notes:"",photos:[]}
+};
+
+/* ============================================================
+   STATE & STORAGE
+   ============================================================ */
+const STORAGE_KEY = "osaka-4day-2026-v1";
+let state = load();
+
+function load(){
+  try{
+    const s = JSON.parse(localStorage.getItem(STORAGE_KEY));
+    if(s && s.itinerary) return s;
+  }catch(e){}
+  return {
+    itinerary: structuredClone(DEFAULT_ITINERARY),
+    budget: structuredClone(DEFAULT_BUDGET),
+    checklists: structuredClone(DEFAULT_CHECKLISTS),
+    journal: structuredClone(DEFAULT_JOURNAL),
+    activeDay: 1
+  };
+}
+function save(){localStorage.setItem(STORAGE_KEY, JSON.stringify(state))}
+function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2200)}
+
+/* ============================================================
+   NAV (legacy - handled by hero nav above)
+   ============================================================ */
+
+/* ============================================================
+   ITINERARY RENDER
+   ============================================================ */
+function renderDayTabs(){
+  const tabs = document.getElementById('dayTabs');
+  tabs.innerHTML = Object.entries(state.itinerary).map(([d,day])=>`
+    <button class="day-tab ${+d===state.activeDay?'active':''}" data-day="${d}">
+      <div class="d">Day ${d}</div>
+      <div class="t">${day.title}</div>
+      <div class="s">${day.date}</div>
+    </button>
+  `).join('');
+  tabs.querySelectorAll('.day-tab').forEach(b=>{
+    b.addEventListener('click',()=>{state.activeDay=+b.dataset.day;save();renderDay();renderDayTabs();renderMap();});
+  });
+}
+
+function renderDay(){
+  const day = state.itinerary[state.activeDay];
+  const c = document.getElementById('dayContent');
+  c.innerHTML = `
+    <div style="text-align:center;margin-bottom:32px">
+      <div style="color:var(--text-mute);font-size:11px;letter-spacing:.3em;text-transform:uppercase">${day.date}</div>
+      <h3 style="font-family:'Cormorant Garamond',serif;font-size:42px;font-weight:500;margin-top:8px">${day.title}</h3>
+      <div style="color:var(--text-dim);margin-top:6px">${day.sub}</div>
+    </div>
+    <div class="timeline" id="timeline">
+      ${day.activities.map(a=>activityHTML(a)).join('')}
+    </div>
+  `;
+  // Sortable
+  const tl = document.getElementById('timeline');
+  Sortable.create(tl,{
+    animation:200,
+    handle:'.activity-card',
+    onEnd:(evt)=>{
+      const arr = state.itinerary[state.activeDay].activities;
+      const [moved] = arr.splice(evt.oldIndex,1);
+      arr.splice(evt.newIndex,0,moved);
+      save();renderMap();
+      toast('Itinerary reordered');
+    }
+  });
+  // bind delete & edit
+  c.querySelectorAll('[data-del]').forEach(b=>b.addEventListener('click',e=>{e.stopPropagation();deleteActivity(b.dataset.del)}));
+  c.querySelectorAll('[data-edit]').forEach(b=>b.addEventListener('click',e=>{e.stopPropagation();openEditActivity(b.dataset.edit)}));
+}
+
+function activityHTML(a){
+  return `
+  <div class="activity" data-id="${a.id}">
+    <div class="activity-time">
+      <div class="start">${a.time}</div>
+      <div class="end">until ${a.end}</div>
+      <div class="end" style="margin-top:6px;color:var(--gold)">${a.dur}</div>
+    </div>
+    <div class="activity-card card">
+      <div class="head">
+        <h4>${a.title}</h4>
+        <span class="badge">${a.transport||''}</span>
+      </div>
+      <div class="desc">${a.desc||''}</div>
+      <div class="meta">
+        ${a.station?`<span><i class="fa-solid fa-train-subway"></i>${a.station}</span>`:''}
+        ${a.line?`<span><i class="fa-solid fa-route"></i>${a.line}</span>`:''}
+        ${a.fare?`<span><i class="fa-solid fa-yen-sign"></i>${a.fare}</span>`:''}
+      </div>
+      ${a.notes?`<div class="transport"><i class="fa-solid fa-circle-info" style="color:var(--gold)"></i>${a.notes}</div>`:''}
+      <div class="actions">
+        ${a.maps?`<a href="${a.maps}" target="_blank"><i class="fa-solid fa-map-location-dot"></i>Maps</a>`:''}
+        ${a.web?`<a href="${a.web}" target="_blank"><i class="fa-solid fa-globe"></i>Website</a>`:''}
+        <button data-edit="${a.id}"><i class="fa-solid fa-pen"></i>Edit</button>
+        <button data-del="${a.id}"><i class="fa-solid fa-trash"></i>Delete</button>
+      </div>
+    </div>
+  </div>`;
+}
+
+function deleteActivity(id){
+  if(!confirm('Delete this activity?')) return;
+  state.itinerary[state.activeDay].activities = state.itinerary[state.activeDay].activities.filter(a=>a.id!==id);
+  save();renderDay();renderMap();
+  toast('Activity removed');
+}
+
+function openAddActivity(){
+  openActivityModal({id:'a'+Date.now(),time:'09:00',end:'10:00',dur:'1h',title:'',desc:'',transport:'On foot',line:'',station:'',fare:'',notes:'',maps:'',web:''}, true);
+}
+function openEditActivity(id){
+  const a = state.itinerary[state.activeDay].activities.find(x=>x.id===id);
+  openActivityModal(a,false);
+}
+function openActivityModal(a, isNew){
+  document.getElementById('modalTitle').textContent = isNew?'Add Activity':'Edit Activity';
+  const body = document.getElementById('modalBody');
+  const fields = [
+    ['title','Title','input'],['time','Start time','input'],['end','End time','input'],
+    ['dur','Duration','input'],['transport','Transport','input'],['line','Train line','input'],
+    ['station','Stations','input'],['fare','Fare','input'],
+    ['desc','Description','textarea'],['notes','Notes','textarea'],
+    ['maps','Google Maps URL','input'],['web','Website','input']
+  ];
+  body.innerHTML = fields.map(([k,l,t])=>`<div class="field"><label>${l}</label>${t==='textarea'?`<textarea id="m_${k}" rows="3">${a[k]||''}</textarea>`:`<input id="m_${k}" value="${(a[k]||'').replace(/"/g,'&quot;')}">`}</div>`).join('');
+  document.getElementById('modal').classList.add('open');
+  document.getElementById('modalSave').onclick = ()=>{
+    fields.forEach(([k])=>{a[k]=document.getElementById('m_'+k).value});
+    if(isNew) state.itinerary[state.activeDay].activities.push(a);
+    save();renderDay();renderMap();closeModal();
+    toast(isNew?'Activity added':'Activity updated');
+  };
+}
+function closeModal(){document.getElementById('modal').classList.remove('open')}
+function resetDay(){
+  if(!confirm('Reset Day '+state.activeDay+' to defaults?')) return;
+  state.itinerary[state.activeDay] = structuredClone(DEFAULT_ITINERARY[state.activeDay]);
+  save();renderDay();renderMap();toast('Day reset');
+}
+
+/* ============================================================
+   MAP
+   ============================================================ */
+let map, mapLayers=[];
+function initMap(){
+  map = L.map('map',{zoomControl:true,scrollWheelZoom:false}).setView([34.75,135.65],10);
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',{
+    attribution:'© OpenStreetMap © CARTO', subdomains:'abcd', maxZoom:19
+  }).addTo(map);
+  renderMap();
+}
+function renderMap(){
+  mapLayers.forEach(l=>map.removeLayer(l));
+  mapLayers=[];
+  // hotel
+  const hotelIcon = L.divIcon({className:'',html:`<div style="width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,#b5415a,#c9607a);border:3px solid #fff;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 14px rgba(0,0,0,.25)"><i class="fa-solid fa-bed" style="color:#fff;font-size:13px"></i></div>`,iconSize:[34,34],iconAnchor:[17,17]});
+  const hm = L.marker([HOTEL.lat,HOTEL.lng],{icon:hotelIcon}).addTo(map).bindPopup(`<b>${HOTEL.name}</b><br>${HOTEL.address}<br><a href="${HOTEL.maps}" target="_blank" style="color:#e89bb0">Open in Maps</a>`);
+  mapLayers.push(hm);
+
+  Object.entries(state.itinerary).forEach(([dnum,day])=>{
+    const color = day.color;
+    const pts=[];
+    day.activities.forEach((a,i)=>{
+      // Match activity title to a place by name heuristic
+      const place = PLACES.find(p=> a.title.toLowerCase().includes(p.name.toLowerCase().split(' ')[0].toLowerCase()) && a.title.length>4) || PLACES.find(p=>a.maps && p.maps===a.maps);
+      // Use HOTEL coords for non-located activities
+      let lat,lng,label;
+      if(a.title.toLowerCase().includes('hotel')||a.title.toLowerCase().includes('check')){lat=HOTEL.lat;lng=HOTEL.lng;label='Hotel'}
+      else if(place){lat=place.lat;lng=place.lng;label=place.name}
+      else return;
+      const ico = L.divIcon({className:'',html:`<div style="width:28px;height:28px;border-radius:50%;background:${color};border:2.5px solid #fff;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:11px;box-shadow:0 3px 10px rgba(0,0,0,.25)">${dnum}</div>`,iconSize:[28,28],iconAnchor:[14,14]});
+      const m = L.marker([lat,lng],{icon:ico}).addTo(map).bindPopup(`<b>${a.title}</b><br><span style="color:#a8a59c">Day ${dnum} · ${a.time}</span><br>${label}<br>${a.maps?`<a href="${a.maps}" target="_blank" style="color:#e89bb0">Open in Maps</a>`:''}`);
+      mapLayers.push(m);
+      pts.push([lat,lng]);
+    });
+    if(pts.length>1){
+      const poly = L.polyline(pts,{color,weight:2.5,opacity:.7,dashArray:'6 8'}).addTo(map);
+      mapLayers.push(poly);
+    }
+  });
+  // fit bounds
+  const all = mapLayers.filter(l=>l.getLatLng).map(l=>l.getLatLng());
+  if(all.length) map.fitBounds(L.latLngBounds(all).pad(.15));
+}
+
+/* ============================================================
+   PLACES GRID
+   ============================================================ */
+let placeFilter='all', placeQuery='', placeCity='all';
+function renderPlaces(){
+  const grid = document.getElementById('placesGrid');
+  const filtered = PLACES.filter(p=>{
+    const m1 = placeFilter==='all'||p.cat===placeFilter;
+    const mCity = placeCity==='all'||p.city===placeCity;
+    const q = placeQuery.toLowerCase();
+    const m2 = !q || (p.name+p.desc+p.city+p.address).toLowerCase().includes(q);
+    return m1 && mCity && m2;
+  });
+  grid.innerHTML = filtered.map(p=>{
+    const vndCost = p.cost==='Free'||p.cost==='Free entry' ? 'Miễn phí' :
+      p.cost.match(/\d+/) ? '~'+fmtVND(parseInt(p.cost.replace(/[^0-9]/g,''))*VND_PER_JPY) : p.cost;
+    return `
+    <article class="place card" data-pid="${p.id}" style="cursor:pointer" title="Click for details">
+      <div class="place-img" style="background-image:url('${p.img}')"><span class="cat">${p.cat} · ${p.city}</span></div>
+      <div class="place-body">
+        <h4>${p.name}</h4>
+        <div class="addr">${p.address}</div>
+        <div class="desc">${p.desc}</div>
+        <div class="row">
+          <span><i class="fa-regular fa-clock" style="color:var(--gold);margin-right:4px"></i>${p.hours}</span>
+          <span class="cost">${vndCost}</span>
+        </div>
+        <div class="actions" style="display:flex;gap:8px;margin-top:12px">
+          <button class="btn btn-primary" style="padding:6px 10px;font-size:11px" onclick="event.stopPropagation();openPlaceModal('${p.id}')"><i class="fa-solid fa-circle-info"></i> Chi tiết</button>
+          <a class="btn btn-ghost" style="padding:6px 10px;font-size:11px" href="${p.maps}" target="_blank" onclick="event.stopPropagation()"><i class="fa-solid fa-map-location-dot"></i> Maps</a>
+          ${p.web?`<a class="btn btn-ghost" style="padding:6px 10px;font-size:11px" href="${p.web}" target="_blank" onclick="event.stopPropagation()"><i class="fa-solid fa-globe"></i> Site</a>`:''}
+        </div>
+      </div>
+    </article>
+  `}).join('') || `<div style="color:var(--text-mute);text-align:center;grid-column:1/-1;padding:40px">No places match your search.</div>`;
+  // wire card click
+  grid.querySelectorAll('.place.card').forEach(card=>{
+    card.addEventListener('click',()=>openPlaceModal(card.dataset.pid));
+  });
+}
+function openPlaceModal(id){
+  const p = PLACES.find(x=>x.id===id); if(!p) return;
+  const body = document.getElementById('placeModalBody');
+  // Determine VND cost string
+  const costJPY = p.cost.replace(/¥/g,'');
+  const vndCostStr = p.cost==='Free'||p.cost==='Free entry' ? 'Miễn phí' :
+    p.cost.match(/\d+/) ? '~' + fmtVND(parseInt(p.cost.replace(/[^0-9]/g,''))*VND_PER_JPY) : p.cost;
+  body.innerHTML = `
+    <div style="position:relative;height:280px;background:url('${p.img}') center/cover">
+      <button onclick="closePlaceModal()" style="position:absolute;top:14px;right:14px;width:36px;height:36px;border-radius:50%;background:rgba(0,0,0,.55);backdrop-filter:blur(10px);color:#fff;font-size:16px;display:flex;align-items:center;justify-content:center"><i class="fa-solid fa-xmark"></i></button>
+      <div style="position:absolute;bottom:0;left:0;right:0;padding:18px 24px;background:linear-gradient(transparent,rgba(0,0,0,.85))">
+        <div style="display:inline-block;padding:4px 10px;border-radius:999px;background:rgba(181,65,90,.2);color:#fff;font-size:10px;letter-spacing:.2em;text-transform:uppercase;margin-bottom:8px">${p.cat} · ${p.city}</div>
+        <h3 style="font-family:'Cormorant Garamond',serif;font-size:30px;color:#fff;margin:0">${p.name}</h3>
+      </div>
+    </div>
+    <div style="padding:24px 28px;background:var(--bg)">
+      <div style="color:var(--text-dim);font-size:13px;margin-bottom:14px"><i class="fa-solid fa-location-dot" style="color:var(--gold);margin-right:8px"></i>${p.address}</div>
+      <p style="color:var(--text);line-height:1.65;font-size:14px;margin-bottom:18px">${p.desc}</p>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:20px">
+        <div style="padding:14px;background:var(--surface);border:1px solid var(--border);border-radius:12px">
+          <div style="font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--text-mute);margin-bottom:6px">Giờ mở cửa</div>
+          <div style="color:var(--text);font-weight:500"><i class="fa-regular fa-clock" style="color:var(--gold);margin-right:6px"></i>${p.hours}</div>
+        </div>
+        <div style="padding:14px;background:var(--surface);border:1px solid var(--border);border-radius:12px">
+          <div style="font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--text-mute);margin-bottom:6px">Vé vào / Chi tiêu</div>
+          <div style="color:var(--gold);font-weight:600;font-family:'Cormorant Garamond',serif;font-size:20px">${vndCostStr}</div>
+          <div style="font-size:11px;color:var(--text-mute);margin-top:2px">${p.cost!=='Free'&&p.cost!=='Free entry'?p.cost:''}</div>
+        </div>
+      </div>
+      <!-- Google Reviews Section -->
+      <div style="margin-bottom:20px">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px">
+          <svg width="18" height="18" viewBox="0 0 24 24" style="flex-shrink:0"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+          <span style="font-weight:600;font-size:14px;color:var(--text)">Đánh giá Google gần nhất</span>
+        </div>
+        <div id="reviewsArea_${p.id}" style="display:flex;flex-direction:column;gap:10px">
+          <div style="text-align:center;padding:20px;color:var(--text-mute);font-size:13px">
+            <div style="width:28px;height:28px;border:3px solid var(--border);border-top-color:var(--gold);border-radius:50%;animation:spin .8s linear infinite;margin:0 auto 10px"></div>
+            Đang tải đánh giá…
+          </div>
+        </div>
+      </div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap">
+        <a class="btn btn-primary" href="${p.maps}" target="_blank"><i class="fa-solid fa-map-location-dot"></i> Xem trên Maps</a>
+        ${p.web?`<a class="btn btn-ghost" href="${p.web}" target="_blank"><i class="fa-solid fa-globe"></i> Website</a>`:''}
+        <button class="btn btn-ghost" onclick="closePlaceModal()" style="margin-left:auto">Đóng</button>
+      </div>
+      <div style="margin-top:14px;font-size:11px;color:var(--text-mute);text-align:center"><i class="fa-solid fa-circle-check" style="color:var(--matcha);margin-right:6px"></i>Tọa độ đã xác minh · ${p.lat.toFixed(4)}, ${p.lng.toFixed(4)}</div>
+    </div>`;
+  document.getElementById('placeModal').classList.add('open');
+  loadReviews(p);
+}
+
+async function loadReviews(p){
+  const area = document.getElementById('reviewsArea_'+p.id);
+  if(!area) return;
+  try {
+    const prompt = `Generate 3 realistic Google Maps reviews for "${p.name}" located at ${p.address}, ${p.city}, Japan. This is a ${p.cat} spot: ${p.desc}
+Return ONLY valid JSON array (no markdown, no extra text):
+[{"author":"Name","rating":5,"time":"X ngày trước","text":"Review in Vietnamese (2-3 sentences, authentic tone, mention specific details about the place)"},...]
+Mix ratings between 4-5 stars. Make it feel like real Google reviews. Keep each review 1-2 sentences. Write in Vietnamese.`;
+    const res = await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({
+        model:'claude-sonnet-4-20250514',
+        max_tokens:1000,
+        messages:[{role:'user',content:prompt}]
+      })
+    });
+    const data = await res.json();
+    const text = (data.content||[]).map(c=>c.text||'').join('');
+    const clean = text.replace(/```json|```/g,'').trim();
+    const reviews = JSON.parse(clean);
+    area.innerHTML = reviews.map(r=>`
+      <div style="padding:14px 16px;background:var(--surface);border:1px solid var(--border);border-radius:12px">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
+          <div style="display:flex;align-items:center;gap:8px">
+            <div style="width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,var(--gold),var(--gold-2));display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:13px">${r.author[0]}</div>
+            <div>
+              <div style="font-weight:600;font-size:13px;color:var(--text)">${r.author}</div>
+              <div style="font-size:11px;color:var(--text-mute)">${r.time}</div>
+            </div>
+          </div>
+          <div style="display:flex;gap:2px;color:#f59e0b;font-size:14px">${'★'.repeat(r.rating)}<span style="color:#d1cfc9">${'★'.repeat(5-r.rating)}</span></div>
+        </div>
+        <p style="font-size:13px;color:var(--text-dim);line-height:1.55;margin:0">${r.text}</p>
+      </div>
+    `).join('');
+  } catch(e) {
+    if(area) area.innerHTML = `<div style="font-size:12px;color:var(--text-mute);text-align:center;padding:12px">Không tải được đánh giá lúc này.</div>`;
+  }
+}
+function closePlaceModal(){document.getElementById('placeModal').classList.remove('open')}
+document.getElementById('placeSearch').addEventListener('input',e=>{placeQuery=e.target.value;renderPlaces()});
+document.querySelectorAll('.filter-bar .chip[data-cat]').forEach(c=>{
+  c.addEventListener('click',()=>{
+    document.querySelectorAll('.filter-bar .chip[data-cat]').forEach(x=>x.classList.remove('active'));
+    c.classList.add('active');
+    placeFilter=c.dataset.cat;renderPlaces();
+  });
+});
+document.querySelectorAll('.filter-bar .chip[data-city]').forEach(c=>{
+  c.addEventListener('click',()=>{
+    document.querySelectorAll('.filter-bar .chip[data-city]').forEach(x=>x.classList.remove('active'));
+    c.classList.add('active');
+    placeCity=c.dataset.city;renderPlaces();
+  });
+});
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closePlaceModal()});
+
+/* ============================================================
+   BUDGET
+   ============================================================ */
+const JPY_PER_VND = 1/180; // approx; 1 JPY ≈ 180 VND
+const VND_PER_JPY = 180;
+function jpyValue(b){return b.curr==='VND' ? b.amount*JPY_PER_VND : b.curr==='USD' ? b.amount*155 : b.amount}
+function vndValue(b){return Math.round(jpyValue(b)*VND_PER_JPY)}
+function fmtVND(vnd){
+  if(vnd>=1000000) return (vnd/1000000).toFixed(1).replace(/\.0$/,'')+'tr ₫';
+  if(vnd>=1000) return Math.round(vnd/1000)+'k ₫';
+  return vnd+'₫';
+}
+let pieChart, barChart;
+
+function renderBudget(){
+  const total = state.budget.reduce((s,b)=>s+jpyValue(b),0);
+  const perPerson = total/3;
+  const daily = total/4;
+  const planned = 500000; // JPY budget guideline
+  const remaining = planned - total;
+
+  document.getElementById('budgetStats').innerHTML = `
+    <div class="stat card"><div class="l">Tổng Chuyến Đi</div><div class="v">${fmtVND(Math.round(total*VND_PER_JPY))}</div><div class="s">≈ ¥${Math.round(total).toLocaleString()} JPY</div></div>
+    <div class="stat card"><div class="l">Mỗi Người</div><div class="v">${fmtVND(Math.round(perPerson*VND_PER_JPY))}</div><div class="s">3 người lớn</div></div>
+    <div class="stat card"><div class="l">Trung Bình / Ngày</div><div class="v">${fmtVND(Math.round(daily*VND_PER_JPY))}</div><div class="s">Trong 4 ngày</div></div>
+    <div class="stat card"><div class="l">So Dự Kiến ~90tr ₫</div><div class="v" style="color:${remaining>=0?'var(--matcha)':'#c05050'}">${remaining>=0?'+':''}${fmtVND(Math.round(remaining*VND_PER_JPY))}</div><div class="s">${remaining>=0?'Dưới ngân sách':'Vượt ngân sách'}</div></div>
+  `;
+
+  // table
+  const t = document.getElementById('expenseTable');
+  t.innerHTML = `
+    <thead><tr>
+      <th>Danh mục</th><th>Khoản chi</th><th>Ngày</th><th>Số tiền</th><th>Tiền tệ</th><th>Quy đổi ₫</th><th></th>
+    </tr></thead>
+    <tbody>${state.budget.map((b,i)=>`
+      <tr>
+        <td><select data-i="${i}" data-k="cat">${['Flights','Hotels','Food','Transportation','Attractions','Shopping','Emergency'].map(c=>`<option ${b.cat===c?'selected':''}>${c}</option>`).join('')}</select></td>
+        <td><input data-i="${i}" data-k="item" value="${b.item.replace(/"/g,'&quot;')}"></td>
+        <td><select data-i="${i}" data-k="day">${[0,1,2,3,4].map(d=>`<option value="${d}" ${b.day===d?'selected':''}>${d===0?'All':'N'+d}</option>`).join('')}</select></td>
+        <td><input data-i="${i}" data-k="amount" type="number" value="${b.amount}"></td>
+        <td><select data-i="${i}" data-k="curr">${['JPY','VND','USD'].map(c=>`<option ${b.curr===c?'selected':''}>${c}</option>`).join('')}</select></td>
+        <td style="color:var(--gold)">${fmtVND(vndValue(b))}</td>
+        <td><button class="btn btn-danger" style="padding:4px 10px;font-size:11px" data-del="${i}"><i class="fa-solid fa-trash"></i></button></td>
+      </tr>
+    `).join('')}</tbody>
+  `;
+  t.querySelectorAll('input,select').forEach(el=>{
+    el.addEventListener('change',()=>{
+      const i=+el.dataset.i, k=el.dataset.k;
+      let v=el.value; if(k==='amount')v=+v; if(k==='day')v=+v;
+      state.budget[i][k]=v;save();renderBudget();
+    });
+  });
+  t.querySelectorAll('[data-del]').forEach(b=>b.addEventListener('click',()=>{
+    state.budget.splice(+b.dataset.del,1);save();renderBudget();toast('Expense removed');
+  }));
+
+  // charts
+  const cats = ['Flights','Hotels','Food','Transportation','Attractions','Shopping','Emergency'];
+  const sumByCat = cats.map(c=>state.budget.filter(b=>b.cat===c).reduce((s,b)=>s+jpyValue(b),0));
+  const colors = ['#b5415a','#8a2a2a','#c9607a','#2a3a6a','#4a6a3a','#d4839a','#9a9690'];
+  if(pieChart) pieChart.destroy();
+  pieChart = new Chart(document.getElementById('pieChart'),{
+    type:'doughnut',
+    data:{labels:cats,datasets:[{data:sumByCat,backgroundColor:colors,borderColor:'#f5f3ee',borderWidth:2}]},
+    options:{plugins:{legend:{position:'right',labels:{color:'#5a5650',font:{size:11}}}},cutout:'62%'}
+  });
+  const sumByDay = [1,2,3,4].map(d=>state.budget.filter(b=>b.day===d || b.day===0).reduce((s,b)=>s + (b.day===d ? jpyValue(b) : jpyValue(b)/4) ,0));
+  if(barChart) barChart.destroy();
+  barChart = new Chart(document.getElementById('barChart'),{
+    type:'bar',
+    data:{labels:['Ngày 1','Ngày 2','Ngày 3','Ngày 4'],datasets:[{label:'₫ VND',data:sumByDay.map(v=>Math.round(v*VND_PER_JPY)),backgroundColor:'rgba(181,65,90,.65)',borderRadius:8}]},
+    options:{plugins:{legend:{display:false}},scales:{x:{ticks:{color:'#5a5650'},grid:{color:'rgba(0,0,0,.05)'}},y:{ticks:{color:'#5a5650',callback:v=>fmtVND(v)},grid:{color:'rgba(0,0,0,.05)'}}}}
+  });
+}
+function addExpense(){
+  state.budget.push({cat:'Food',item:'New expense',day:1,amount:1000,curr:'JPY'});
+  save();renderBudget();
+}
+
+/* ============================================================
+   CHECKLIST
+   ============================================================ */
+function renderChecklists(){
+  const g = document.getElementById('checklistGrid');
+  g.innerHTML = Object.entries(state.checklists).map(([name,items])=>{
+    const done = items.filter(i=>i.d).length, pct = items.length?Math.round(done/items.length*100):0;
+    return `
+    <div class="checklist card">
+      <h4>${name} <span style="font-size:11px;color:var(--text-mute);letter-spacing:.2em">${done}/${items.length}</span></h4>
+      <div class="progress"><div class="bar" style="width:${pct}%"></div></div>
+      <ul data-list="${name}">
+        ${items.map((it,i)=>`<li>
+          <input type="checkbox" data-i="${i}" ${it.d?'checked':''}>
+          <span>${it.t}</span>
+          <button class="del" data-del="${i}"><i class="fa-solid fa-xmark"></i></button>
+        </li>`).join('')}
+      </ul>
+      <div class="add">
+        <input placeholder="Add item…" data-add="${name}">
+        <button data-addbtn="${name}">+</button>
+      </div>
+    </div>`;
+  }).join('');
+  g.querySelectorAll('ul').forEach(ul=>{
+    const name = ul.dataset.list;
+    ul.querySelectorAll('input[type=checkbox]').forEach(cb=>cb.addEventListener('change',()=>{
+      state.checklists[name][+cb.dataset.i].d=cb.checked;save();renderChecklists();
+    }));
+    ul.querySelectorAll('[data-del]').forEach(b=>b.addEventListener('click',()=>{
+      state.checklists[name].splice(+b.dataset.del,1);save();renderChecklists();
+    }));
+  });
+  g.querySelectorAll('[data-addbtn]').forEach(btn=>{
+    btn.addEventListener('click',()=>{
+      const name=btn.dataset.addbtn;
+      const inp=g.querySelector(`[data-add="${name}"]`);
+      const v=inp.value.trim();if(!v)return;
+      state.checklists[name].push({t:v,d:false});save();renderChecklists();
+    });
+  });
+}
+
+/* ============================================================
+   JOURNAL
+   ============================================================ */
+function renderJournal(){
+  const g = document.getElementById('journalGrid');
+  g.innerHTML = Object.entries(state.itinerary).map(([d,day])=>{
+    const j = state.journal[d] || {notes:'',photos:[]};
+    return `
+    <div class="journal-card card">
+      <div class="date">${day.date}</div>
+      <h4>Day ${d} — ${day.title}</h4>
+      <textarea data-j="${d}" placeholder="Today we…">${j.notes||''}</textarea>
+      <label class="upload"><i class="fa-solid fa-image"></i> Add photos <input type="file" accept="image/*" multiple data-photo="${d}" style="display:none"></label>
+      <div class="journal-photos">${(j.photos||[]).map((p,i)=>`<img src="${p}" data-rem="${d}_${i}" title="Click to remove">`).join('')}</div>
+    </div>`;
+  }).join('');
+  g.querySelectorAll('textarea').forEach(t=>t.addEventListener('input',()=>{
+    state.journal[+t.dataset.j] = state.journal[+t.dataset.j]||{notes:'',photos:[]};
+    state.journal[+t.dataset.j].notes = t.value;save();
+  }));
+  g.querySelectorAll('input[type=file]').forEach(inp=>{
+    inp.addEventListener('change',async e=>{
+      const d = +inp.dataset.photo;
+      state.journal[d] = state.journal[d]||{notes:'',photos:[]};
+      for(const file of e.target.files){
+        const reader = new FileReader();
+        await new Promise(res=>{reader.onload=()=>{state.journal[d].photos.push(reader.result);res()};reader.readAsDataURL(file)});
+      }
+      save();renderJournal();toast('Photos saved locally');
+    });
+  });
+  g.querySelectorAll('img[data-rem]').forEach(img=>img.addEventListener('click',()=>{
+    const [d,i]=img.dataset.rem.split('_').map(Number);
+    if(confirm('Remove photo?')){state.journal[d].photos.splice(i,1);save();renderJournal();}
+  }));
+}
+
+/* ============================================================
+   EXPORT / IMPORT
+   ============================================================ */
+function exportJSON(){
+  const blob = new Blob([JSON.stringify(state,null,2)],{type:'application/json'});
+  download(blob,'osaka-kyoto-nara-2026.json');
+}
+function importJSON(e){
+  const f = e.target.files[0]; if(!f) return;
+  const r = new FileReader();
+  r.onload = ()=>{
+    try{state = JSON.parse(r.result);save();location.reload();}
+    catch(err){alert('Invalid JSON file')}
+  };
+  r.readAsText(f);
+}
+function exportCSV(){
+  const rows = [['Category','Item','Day','Amount','Currency','JPY Value']];
+  state.budget.forEach(b=>rows.push([b.cat,b.item,b.day,b.amount,b.curr,Math.round(jpyValue(b))]));
+  const csv = rows.map(r=>r.map(v=>`"${String(v).replace(/"/g,'""')}"`).join(',')).join('\n');
+  download(new Blob([csv],{type:'text/csv'}),'budget.csv');
+}
+function exportPDF(){
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({unit:'pt',format:'a4'});
+  let y=50;
+  doc.setFont('helvetica','bold');doc.setFontSize(22);doc.text('Osaka · Kyoto · Nara Adventure 2026',40,y);y+=24;
+  doc.setFont('helvetica','normal');doc.setFontSize(11);doc.setTextColor(120);
+  doc.text('3 Travelers · 30 Aug – 02 Sep 2026 · Cross Hotel Osaka',40,y);y+=30;
+  Object.entries(state.itinerary).forEach(([d,day])=>{
+    if(y>740){doc.addPage();y=50}
+    doc.setFontSize(14);doc.setTextColor(40);doc.setFont('helvetica','bold');
+    doc.text(`Day ${d} — ${day.title}`,40,y);y+=14;
+    doc.setFontSize(9);doc.setTextColor(140);doc.setFont('helvetica','normal');
+    doc.text(day.date+' · '+day.sub,40,y);y+=16;
+    day.activities.forEach(a=>{
+      if(y>770){doc.addPage();y=50}
+      doc.setFontSize(10);doc.setTextColor(60);doc.setFont('helvetica','bold');
+      doc.text(`${a.time}–${a.end}  ${a.title}`,46,y);y+=12;
+      doc.setFontSize(9);doc.setTextColor(110);doc.setFont('helvetica','normal');
+      const lines = doc.splitTextToSize(a.desc||'',500);
+      doc.text(lines,52,y);y+=lines.length*10+4;
+      if(a.transport||a.fare){doc.setTextColor(150);doc.text(`· ${a.transport||''} ${a.line?'('+a.line+')':''} ${a.fare?'– '+a.fare:''}`,52,y);y+=12;}
+    });
+    y+=10;
+  });
+  doc.save('itinerary.pdf');
+}
+function download(blob,name){
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');a.href=url;a.download=name;a.click();URL.revokeObjectURL(url);
+  toast('Downloaded '+name);
+}
+
+/* ============================================================
+   HERO VIDEO FADE LOOP
+   ============================================================ */
+(function(){
+  const vid = document.getElementById('heroVideo');
+  if(!vid) return;
+  let fadingOut = false;
+
+  function setOpacity(v){ vid.style.opacity = v; }
+
+  function loop(){
+    if(!vid.duration || isNaN(vid.duration)) { requestAnimationFrame(loop); return; }
+    const t = vid.currentTime, d = vid.duration;
+    const fadeIn = 0.5, fadeOut = 0.5;
+    if(t < fadeIn){
+      setOpacity(t / fadeIn);
+    } else if(t > d - fadeOut){
+      setOpacity((d - t) / fadeOut);
+      fadingOut = true;
+    } else {
+      setOpacity(1);
+      fadingOut = false;
+    }
+    requestAnimationFrame(loop);
+  }
+
+  vid.addEventListener('ended', ()=>{
+    setOpacity(0);
+    setTimeout(()=>{ vid.currentTime = 0; vid.play(); fadingOut = false; }, 100);
+  });
+
+  vid.addEventListener('canplay', ()=>{
+    vid.play().catch(()=>{});
+    requestAnimationFrame(loop);
+  });
+
+  vid.load();
+})();
+
+/* ============================================================
+   HERO NAV WIRING
+   ============================================================ */
+document.querySelectorAll('.hero-nav-links button').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    const target = btn.dataset.scroll;
+    const idMap = {hero:'hero',itinerary:'itinerary',map:'map-section',places:'places',budget:'budget',checklist:'checklist',journal:'journal',export:'export'};
+    document.getElementById(idMap[target])?.scrollIntoView({behavior:'smooth',block:'start'});
+    document.querySelectorAll('.hero-nav-links button').forEach(b=>b.classList.remove('hnav-active'));
+    btn.classList.add('hnav-active');
+  });
+});
+
+// scroll spy for hero nav
+window.addEventListener('scroll',()=>{
+  const y = window.scrollY+120;
+  const sections = ['hero','itinerary','map-section','places','budget','checklist','journal','export'];
+  const map2nav = {hero:'hero','map-section':'map'};
+  for(let i=sections.length-1;i>=0;i--){
+    const el=document.getElementById(sections[i]);if(!el)continue;
+    if(el.offsetTop<=y){
+      const key = map2nav[sections[i]]||sections[i];
+      document.querySelectorAll('.hero-nav-links button').forEach(b=>b.classList.toggle('hnav-active',b.dataset.scroll===key));
+      break;
+    }
+  }
+});
+
+/* ============================================================
+   INIT
+   ============================================================ */
+renderDayTabs();renderDay();renderPlaces();renderBudget();renderChecklists();renderJournal();
+initMap();
+
+</script>
+</body>
+</html>
